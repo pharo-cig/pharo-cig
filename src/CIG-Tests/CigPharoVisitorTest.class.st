@@ -414,9 +414,89 @@ CigPharoVisitorTest >> testVisitFunctionAddsFunctionToLibrary [
 
 { #category : 'tests - function' }
 CigPharoVisitorTest >> testVisitFunctionWithArrayParameterAddsArrayType [
+	"an argument with [NUM] should add a typedef"
+	| unit element template visitor class |
 
-	self skip. "I do not remember why I added it (to see later) :P"
-	self fail
+	unit := self newUnit: '
+		int aFunction(int arg[42]);'.
+
+	element := unit elements first.
+
+	visitor := CigPharoVisitor newForTest.
+	visitor addBaseClasses: self translatedUnitTvision.
+	
+	class := self class environment classNamed: 'LibGeneratedForTest'.
+	
+	visitor visitFunction: element.
+	
+	self assert: (class canUnderstand: #aFunction:).
+	self 
+		assert: (class >> #aFunction:) sourceCode 
+		equals: 'aFunction: arg
+
+	^ self ffiCall: #(int aFunction(int_42 arg))'.
+	
+	self assert: (visitor types includesKey: 'int_42').
+	self assert: (visitor types at: 'int_42') equals: 'int[42]' 
+]
+
+{ #category : 'tests - function' }
+CigPharoVisitorTest >> testVisitFunctionWithArrayParameterAddsStructArrayType [
+	"an argument with [NUM] should add a typedef"
+	| unit element template visitor class |
+
+	unit := self newUnit: '
+		struct tt { int a };
+		int aFunction(struct tt arg[42]);'.
+
+	element := unit elements second.
+
+	visitor := CigPharoVisitor newForTest.
+	visitor addBaseClasses: self translatedUnitTvision.
+	
+	visitor visitFunction: element.
+
+	class := self class environment classNamed: 'LibGeneratedForTest'.
+	
+	visitor visitFunction: element.
+
+	self assert: (class canUnderstand: #aFunction:).
+	self 
+		assert: (class >> #aFunction:) sourceCode 
+		equals: 'aFunction: arg
+
+	^ self ffiCall: #(int aFunction(tt_42 arg))'.
+	
+	self assert: (visitor types includesKey: 'tt_42').
+	self assert: (visitor types at: 'tt_42') equals: 'struct tt[42]' 	
+]
+
+{ #category : 'tests - function' }
+CigPharoVisitorTest >> testVisitFunctionWithConstArrayParameterAddsArrayType [
+	"an argument with [NUM] should add a typedef"
+	| unit element template visitor class |
+
+	unit := self newUnit: '
+		int aFunction(const int arg[42]);'.
+
+	element := unit elements first.
+
+	visitor := CigPharoVisitor newForTest.
+	visitor addBaseClasses: self translatedUnitTvision.
+	
+	class := self class environment classNamed: 'LibGeneratedForTest'.
+	
+	visitor visitFunction: element.
+	
+	self assert: (class canUnderstand: #aFunction:).
+	self 
+		assert: (class >> #aFunction:) sourceCode 
+		equals: 'aFunction: arg
+
+	^ self ffiCall: #(int aFunction(const int_42 arg))'.
+	
+	self assert: (visitor types includesKey: 'int_42').
+	self assert: (visitor types at: 'int_42') equals: 'int[42]' 
 ]
 
 { #category : 'tests - function' }

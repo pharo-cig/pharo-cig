@@ -34,11 +34,8 @@ CigPharoFunctionGenerator >> generate [
 CigPharoFunctionGenerator >> generateOn: aVisitor [
 
 	self generate.
-	"self element resolveReturnType isArray 
-		ifTrue: [ self halt ].
-	self element parameters 
-		select: [ :each | each resolveType isArray ]
-		thenDo: [ :each | self halt ]"
+	self element cTemplate parameters
+		do: [ :each | each registerRequiredTypeOn: aVisitor ]
 ]
 
 { #category : 'private' }

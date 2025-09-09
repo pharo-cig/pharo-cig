@@ -142,6 +142,19 @@ CigElement >> elementAtPath: aPath [
 ]
 
 { #category : 'accessing' }
+CigElement >> elementAtPath: aPath excluding: aCollectionOfElements [
+	| current |
+
+	current := self.
+	aPath do: [ :each |
+		current ifNil: [ ^ nil ].
+		current := current findElementMatching: [ :eachElement | 
+			(aCollectionOfElements includes: eachElement) not 
+				and: [ eachElement isEqualToPath: each ] ] ].
+	^ current
+]
+
+{ #category : 'accessing' }
 CigElement >> findDeepElementMatching: aBlock [
 
 	(aBlock value: self) ifTrue: [ ^ self ].
@@ -488,19 +501,6 @@ CigElement >> sanitizeName: aString [
 CigElement >> sanitizedName [
 
 	^ self sanitizeName: self name
-]
-
-{ #category : 'accessing' }
-CigElement >> scopeLookup: aString [
-
-	^ self scopeLookupPath: (CigType toTypePath: aString)
-]
-
-{ #category : 'accessing' }
-CigElement >> scopeLookupPath: aPath [
-
-	^ (self elementAtPath: aPath)
-		ifNil: [ self parent scopeLookupPath: aPath ]
 ]
 
 { #category : 'private' }

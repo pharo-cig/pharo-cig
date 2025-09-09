@@ -35,6 +35,22 @@ CigPharoFunctionTemplateTest >> testGenerateFunctionForCLibraryDoesNotGeneratesP
 ]
 
 { #category : 'tests' }
+CigPharoFunctionTemplateTest >> testGenerateFunctionWithArrayZeroLength [
+	"an argument with [] (zero length) should map to *"
+	| unit element template |
+
+	unit := self newUnit: '
+		int aFunction(int arg[]);'.
+
+	element := unit elements first.
+	template := element elements first cTemplate.
+	
+	self 
+		assert: template generateForFFI
+		equals: 'int_0 arg'
+]
+
+{ #category : 'tests' }
 CigPharoFunctionTemplateTest >> testGenerateFunctionWithCapitalsPrefix [
 	"this will check that a function that is called with capitals does not gets 'camelized' 
 	 (no first letter on lowercase)"
@@ -75,6 +91,59 @@ CigPharoFunctionTemplateTest >> testGenerateFunctionWithReturnString [
 		equals: 'fadeColor: color alpha: alpha
 
 	^ self ffiCall: #(Color Fade(Color color, float alpha))'
+]
+
+{ #category : 'tests' }
+CigPharoFunctionTemplateTest >> testGenerateFunctionWithStructArrayNonZeroLength [
+	"an argument with [] (zero length) should map to *"
+	| unit element template |
+
+	unit := self newUnit: '
+		struct tt { int a };
+		int aFunction(struct tt arg[42]);'.
+
+	element := unit elements second.
+	template := element elements first cTemplate.
+	
+	self 
+		assert: template generateForFFI
+		equals: 'tt_42 arg'
+]
+
+{ #category : 'tests' }
+CigPharoFunctionTemplateTest >> testGenerateFunctionWithStructArrayZeroLength [
+	"an argument with [] (zero length) should map to *"
+	| unit element template |
+
+	unit := self newUnit: '
+		struct tt { int a };
+		int aFunction(struct tt arg[]);'.
+
+	element := unit elements second.
+	template := element elements first cTemplate.
+	
+	self 
+		assert: template generateForFFI
+		equals: 'tt* arg'
+]
+
+{ #category : 'tests' }
+CigPharoFunctionTemplateTest >> testGenerateFunctionWithStructPointerAndNameEqualToStructName [
+	| unit element template |
+
+	unit := self newUnit: '
+		struct tm {
+			int a;
+		};
+
+		int OPENSSL_gmtime_adj(struct tm *tm, int offset_day, long offset_sec);'.
+
+	element := unit elements second.
+	template := element elements first cTemplate.
+	
+	self 
+		assert: template generateForFFI
+		equals: 'tm* tm'
 ]
 
 { #category : 'tests' }

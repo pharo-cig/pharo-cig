@@ -159,6 +159,20 @@ CigTranslatedUnit >> elementAtPath: aPath [
 ]
 
 { #category : 'accessing' }
+CigTranslatedUnit >> elementAtPath: aPath excluding: aCollectionOfElements [
+	| current |
+
+	current := self.
+	aPath do: [ :each |
+		current ifNil: [ ^ nil ].
+		current := current findElementMatching: [ :eachElement | 
+			(aCollectionOfElements includes: eachElement) not 
+				and: [ eachElement isEqualToPath: each ] ] ].
+	
+	^ current
+]
+
+{ #category : 'accessing' }
 CigTranslatedUnit >> elements [
 
 	^ elements ifNil: [ #() ]
@@ -257,7 +271,7 @@ CigTranslatedUnit >> generateFrom: aHeader [
 
 { #category : 'generating' }
 CigTranslatedUnit >> generateTarget: aTarget from: aHeader [
-	| unit cursor tuple fileName index unit |
+	| unit cursor tuple fileName index |
 
 	logger info: 'Processing ', aTarget name, '...'.
 	
@@ -265,7 +279,6 @@ CigTranslatedUnit >> generateTarget: aTarget from: aHeader [
 	fileName := tuple first. 
 	index := tuple second.
 	unit := tuple third.
-
 	cursor := unit cursor.
 	cursor visitChildren: [ :current :parent :data |
 		[ 
@@ -645,6 +658,12 @@ CigTranslatedUnit >> root [
 
 { #category : 'accessing' }
 CigTranslatedUnit >> scopeLookupPath: aPath [
+
+	^ self elementAtPath: aPath
+]
+
+{ #category : 'accessing' }
+CigTranslatedUnit >> scopeLookupPath: aPath excluding: aCollectionOfElements [
 
 	^ self elementAtPath: aPath
 ]

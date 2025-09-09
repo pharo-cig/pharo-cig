@@ -75,7 +75,7 @@ CigCParameterStructTypeTemplate >> generateArgument [
 { #category : 'generating' }
 CigCParameterStructTypeTemplate >> generateCType [
 	| typeName startArity parsed |
-	
+
 	typeName := self elementTypeName.
 	parsed := self type parseType.
 	startArity := 0.	
