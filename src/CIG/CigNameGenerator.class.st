@@ -5,7 +5,8 @@ Class {
 		'withCamelCase',
 		'withPrefixInFunctionName',
 		'withFunctionProtocolGroupByHeader',
-		'renaming'
+		'renaming',
+		'prefixesToStrip'
 	],
 	#category : 'CIG-Base',
 	#package : 'CIG',
@@ -29,8 +30,12 @@ CigNameGenerator >> applyFunctionModifiersTo: aString in: anElement [
 	result := aString.
 	self isPrefixInFunctionName ifFalse: [ 
 		result := self 
-			applyPrefixInFunctionName: result
-			in: anElement ].
+			applyRemovePrefixInName: result
+			prefix: anElement root prefix ].
+	prefixesToStrip do: [ :each |
+		result := self 
+			applyRemovePrefixInName: result 
+			prefix: each ].
 
 	^ result
 ]
@@ -44,10 +49,18 @@ CigNameGenerator >> applyPossibleRanameTo: aString [
 ]
 
 { #category : 'private' }
-CigNameGenerator >> applyPrefixInFunctionName: aString in: anElement [
-	| prefix result |
+CigNameGenerator >> applyPrefixTo: name prefix: prefix [
+
+	^ String streamContents: [ :stream |
+		(name asLowercase beginsWith: prefix asLowercase)
+			ifFalse: [ stream << prefix ].
+		stream << name ]
+]
+
+{ #category : 'private' }
+CigNameGenerator >> applyRemovePrefixInName: aString prefix: prefix [
+	| result |
 	
-	prefix := anElement root prefix.
 	(aString asLowercase beginsWith: prefix asLowercase) ifFalse: [ ^ aString ].
 	
 	result := aString allButFirst: prefix size.
@@ -57,15 +70,6 @@ CigNameGenerator >> applyPrefixInFunctionName: aString in: anElement [
 	^ result
 ]
 
-{ #category : 'private' }
-CigNameGenerator >> applyPrefixTo: name prefix: prefix [
-
-	^ String streamContents: [ :stream |
-		(name asLowercase beginsWith: prefix asLowercase)
-			ifFalse: [ stream << prefix capitalized ].
-		stream << name ]
-]
-
 { #category : 'initialization' }
 CigNameGenerator >> initialize [
 
@@ -73,7 +77,8 @@ CigNameGenerator >> initialize [
 	renaming := Dictionary new.
 	self withCamelCase.
 	self withPrefixInFunctionName.
-	self withFunctionProtocolGroupByHeader
+	self withFunctionProtocolGroupByHeader.
+	prefixesToStrip := #()
 ]
 
 { #category : 'testing' }
@@ -94,7 +99,15 @@ CigNameGenerator >> isPrefixInFunctionName [
 	^ withPrefixInFunctionName
 ]
 
-{ #category : 'accessing' }
+{ #category : 'private' }
+CigNameGenerator >> prefixToUse: aPrefix [
+
+	^ (aPrefix allSatisfy: [ :each | (each between: $A and: $Z) or: [ each isDigit ] ])
+		ifTrue: [ aPrefix ]
+		ifFalse: [ aPrefix capitalized ]
+]
+
+{ #category : 'accessing - scripting' }
 CigNameGenerator >> rename: aName as: aRenamedName [
 	"Sometimes the generated name will conflict with an existing one (or it will 
 	 be ugly, or not good for our purpose in any way). 
@@ -102,6 +115,15 @@ CigNameGenerator >> rename: aName as: aRenamedName [
 	 e.g. `nameGenerator rename: 'Archive' as: 'ArchiveFile'`"
 
 	renaming at: aName put: aRenamedName
+]
+
+{ #category : 'accessing - scripting' }
+CigNameGenerator >> stripPrefix: aPrefix [
+	"Sometimes we want to strip some prefixes from element names (functions, structures, etc) 
+	 that are now *equal* to the package prefix we selected (e.g. I have pixman library with 
+	 prefix Px but I want to remove also 'pixman' prefix. "
+
+	prefixesToStrip := prefixesToStrip copyWith: aPrefix
 ]
 
 { #category : 'visiting' }
@@ -134,10 +156,15 @@ CigNameGenerator >> visitConstructor: anElement [
 { #category : 'visiting' }
 CigNameGenerator >> visitElement: anElement [
 	| unit prefix name fullName |
+	
 	unit := anElement root.
-	prefix := unit prefix asLowercase.
+	prefix := self prefixToUse: unit prefix.
+		
 	name := self applyCamelCaseTo: anElement sanitizedName.
+	prefixesToStrip do: [ :each | 
+		name := self applyRemovePrefixInName: name prefix: each ].
 	fullName := self applyPrefixTo: name prefix: prefix.
+	
 	(anElement name asLowercase beginsWith: prefix) ifFalse: [
 		"it may happen that the name unprefixed clashes with a name prefixed
 		 (e.g. in the case of CurlSockaddr and sockaddr, which are both present 

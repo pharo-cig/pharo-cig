@@ -9,18 +9,27 @@ Class {
 		'headers',
 		'excludeMacros',
 		'excludeMatches',
-		'printHex'
+		'preferHexadecimal',
+		'ignoreEmptyDefinitions',
+		'groupStrategy'
 	],
-	#category : 'CIG-Base',
+	#category : 'CIG-Constant',
 	#package : 'CIG',
-	#tag : 'Base'
+	#tag : 'Constant'
 }
 
 { #category : 'accessing' }
 CigConstantGenerator >> addHeader: aString [ 
+	"Just include constants on specified headers."
 
 	headers ifNil: [ headers := #() ].
 	headers := headers copyWith: aString
+]
+
+{ #category : 'accessing' }
+CigConstantGenerator >> doNotGroup [
+
+	groupStrategy := CigConstantGeneratorNoGroupStrategy new
 ]
 
 { #category : 'accessing - scripting' }
@@ -54,6 +63,24 @@ CigConstantGenerator >> excludeMacros: aCollection [
 ]
 
 { #category : 'accessing' }
+CigConstantGenerator >> groupByHeader [
+
+	groupStrategy := CigConstantGeneratorByHeaderStrategy new
+]
+
+{ #category : 'accessing' }
+CigConstantGenerator >> groupByPrefix: aNumber [
+
+	groupStrategy := CigConstantGeneratorByPrefixStrategy newPrefixLetters: aNumber
+]
+
+{ #category : 'accessing' }
+CigConstantGenerator >> groupStrategy [
+
+	^ groupStrategy
+]
+
+{ #category : 'accessing' }
 CigConstantGenerator >> headers [
 
 	^ headers
@@ -65,42 +92,84 @@ CigConstantGenerator >> headers: aCollection [
 	headers := aCollection
 ]
 
+{ #category : 'accessing' }
+CigConstantGenerator >> ignoreEmptyDefinitions [
+
+	ignoreEmptyDefinitions := true
+]
+
 { #category : 'accessing - scripting' }
 CigConstantGenerator >> include: aString [ 
 
 	self addHeader: aString
 ]
 
+{ #category : 'accessing' }
+CigConstantGenerator >> includeEmptyDefinitions [
+
+	ignoreEmptyDefinitions := false
+]
+
 { #category : 'initialization' }
 CigConstantGenerator >> initialize [
 
 	super initialize.
-	printHex := true.
 	excludeMacros := #().
-	excludeMatches := #()
+	excludeMatches := #().
+	self doNotGroup.
+	self preferHexadecimal.
+	self ignoreEmptyDefinitions
+]
+
+{ #category : 'private' }
+CigConstantGenerator >> isInIncludedHeaders: aStringOrFileReference [
+	| basename |
+
+	headers isEmptyOrNil ifTrue: [ ^ true ].
+	
+	basename := aStringOrFileReference asFileReference basename.
+	^ headers anySatisfy: [ :each | basename = each ]
+]
+
+{ #category : 'testing' }
+CigConstantGenerator >> isPreferHexadecimal [
+
+	^ preferHexadecimal
 ]
 
 { #category : 'testing' }
 CigConstantGenerator >> isPrintable: aMacroDefinition [
 
 	^ (excludeMacros includes: aMacroDefinition name) not
-		and: [ excludeMatches noneSatisfy: [ :eachRegex | eachRegex matches: aMacroDefinition name ] ]
+		and: [ (excludeMatches noneSatisfy: [ :eachRegex | eachRegex matches: aMacroDefinition name ])
+		and: [ self isInIncludedHeaders: aMacroDefinition location  ] ] 
 ]
 
 { #category : 'accessing' }
-CigConstantGenerator >> printDecimal [
+CigConstantGenerator >> preferDecimal [
+	"When we do not get literal constants, we need to calculate and print the result. 
+	 We can tell the generator to prefer decimal notation to print the numbers."
 
-	printHex := false
+	preferHexadecimal := false
 ]
 
 { #category : 'accessing' }
-CigConstantGenerator >> printHex [
+CigConstantGenerator >> preferHexadecimal [
+	"When we do not get literal constants, we need to calculate and print the result. 
+	 We can tell the generator to prefer hexadecimal notation to print the numbers.
+	 This is the DEFAULT"
 
-	printHex := true
+	preferHexadecimal := true
 ]
 
 { #category : 'testing' }
-CigConstantGenerator >> shouldPrintNumbersAsHex [
+CigConstantGenerator >> shouldIgnoreEmptyDefinitions [
 
-	^ printHex
+	^ ignoreEmptyDefinitions
+]
+
+{ #category : 'testing' }
+CigConstantGenerator >> shouldPreferHexadecimal [
+
+	^ preferHexadecimal
 ]

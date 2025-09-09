@@ -461,7 +461,7 @@ CigLibraryGenerator >> macLibraryName: aString [
 { #category : 'accessing' }
 CigLibraryGenerator >> nameGenerator [
 
-	^ nameGenerator
+	^ nameGenerator ifNil: [ nameGenerator := CigNameGenerator new ]
 ]
 
 { #category : 'accessing - configuration' }
@@ -644,6 +644,13 @@ CigLibraryGenerator >> withClasses [
 	withClasses := true
 ]
 
+{ #category : 'accessing - scripting' }
+CigLibraryGenerator >> withConstantGenerator: aBlock [
+
+	constantGenerator ifNil: [ constantGenerator := CigConstantGenerator new ].
+	aBlock value: constantGenerator
+]
+
 { #category : 'accessing - configuration' }
 CigLibraryGenerator >> withConstants [
 	"Indicate the generator you want to generate a SharedPool named `LibraryNameConstants` 
@@ -653,6 +660,13 @@ CigLibraryGenerator >> withConstants [
 	 DEFAULT: true"
 
 	withConstants := true
+]
+
+{ #category : 'accessing - scripting' }
+CigLibraryGenerator >> withNameGenerator: aBlock [
+
+	nameGenerator ifNil: [ nameGenerator := CigNameGenerator new ].
+	aBlock value: nameGenerator
 ]
 
 { #category : 'accessing - configuration' }

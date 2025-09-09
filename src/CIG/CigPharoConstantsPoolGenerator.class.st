@@ -2,7 +2,7 @@ Class {
 	#name : 'CigPharoConstantsPoolGenerator',
 	#superclass : 'CigPharoGenerator',
 	#instVars : [
-		'generatedClass'
+		'generatedClassName'
 	],
 	#category : 'CIG-Pharo-Generator',
 	#package : 'CIG',
@@ -13,130 +13,71 @@ Class {
 CigPharoConstantsPoolGenerator class >> constantsTemplate [
 
 	^ '
-#define fmt_spec(x) _Generic((x), \
-    int: "%d", \
-    unsigned int: "%u", \
-    long: "%ld", \
-    unsigned long: "%lu", \
-    long long: "%lld", \
-    unsigned long long: "%llu", \
-    short: "%hd", \
-    unsigned short: "%hu", \
-    signed char: "%hhd", \
-    unsigned char: "%hhu", \
-    char: "%c", \
-    float: "%f", \
-    double: "%f", \
-    long double: "%Lf", \
-    char *: "\"%s\"", \
-    const char *: "\"%s\"", \
-    default: "<unknown type>")
+#if defined(__clang__)
+	#pragma clang diagnostic push
+	#pragma clang diagnostic ignored "-Weverything"
+#endif
+#define REQUIRE_EXPR(x) ((void)sizeof((void)(x)))
+#define AFTER_EXPR(x, expr) (REQUIRE_EXPR(x), (expr))
 #define print_macro(x) \
-    do { \
-        printf("%s=", #x); \
-        printf(fmt_spec((x)+0), (x)+0); \
-        printf("\n"); \
-    } while (0)
+    AFTER_EXPR(x, _Generic((x), \
+        char:               printf(#x "=%d\n",  (int)(x)), \
+        signed char:        printf(#x "=%d\n",  (int)(x)), \
+        unsigned char:      printf(#x "=%u\n",  (unsigned)(x)), \
+        short:              printf(#x "=%d\n",  (int)(x)), \
+        unsigned short:     printf(#x "=%u\n",  (unsigned)(x)), \
+        int:                printf(#x "=%d\n",  (x)), \
+        unsigned:           printf(#x "=%u\n",  (x)), \
+        long:               printf(#x "=%ld\n", (x)), \
+        unsigned long:      printf(#x "=%lu\n", (x)), \
+        long long:          printf(#x "=%lld\n",(x)), \
+        unsigned long long: printf(#x "=%llu\n",(x)), \
+        float:              printf(#x "=%f\n",  (double)(x)), \
+        double:             printf(#x "=%f\n",  (x)), \
+        long double:        printf(#x "=%Lf\n", (x)), \
+        char *:             printf(#x "=\"%s\"\n",  (x)), \
+        const char *:       printf(#x "=\"%s\"\n",  (x)), \
+        default:            printf(#x "=[CIGUNSUPORTED]\n") \
+    ))
 '
 ]
 
 { #category : 'private' }
-CigPharoConstantsPoolGenerator >> addClassAccessors: aCollection [
+CigPharoConstantsPoolGenerator >> addClass [
+	| constantsName generatedClass |
 
-	aCollection do: [ :each | 
-		self generatedClass class 
-			compileSilently: ('{1}
-
-	^ {1}' format: { each })
-			classified: 'accessing' ]
-]
-
-{ #category : 'private' }
-CigPharoConstantsPoolGenerator >> addClassInitializationMethodConstants: aDictionary [
-
-	generatedClass class 
-		compile: (self classInitializationTemplate: aDictionary)
-		classified: 'class initialization'.
-		
-	generatedClass initialize
-]
-
-{ #category : 'private' }
-CigPharoConstantsPoolGenerator >> addClassWithConstants: aCollection [
-	| typesName |
-
-	typesName := self libraryConstantsName.
-	generatedClass := SharedPool << typesName asSymbol
-		sharedVariables: (self collectSharedVariables: aCollection); 
+	constantsName := self libraryConstantsName.
+	generatedClass := SharedPool << constantsName asSymbol
+		sharedVariables: #(); 
 		tag: 'Library';
 		package: self packageName;
-		install
-]
-
-{ #category : 'private' }
-CigPharoConstantsPoolGenerator >> classInitializationTemplate: aDictionary [
-
-	^ String streamContents: [ :stream |
-		stream << 'initialize'; cr; cr.
-		aDictionary associations 
-			do: [ :assoc | 
-				stream tab.
-				stream <<  assoc key << ' := '.
-				"no point on print hex values of 0-9 values"
-				(assoc value isNumber 
-					and: [ self shouldPrintNumbersAsHex 
-					and: [ assoc value abs > 9 ] ])
-					ifTrue: [ stream << assoc value hex ]
-					ifFalse: [ stream print: assoc value ] ]
-			separatedBy: [ 
-				stream << '.'; cr ] ]
-]
-
-{ #category : 'private' }
-CigPharoConstantsPoolGenerator >> collectConstantValues: aCollection [
-	"
-	1. generate temporal file and compile it, get results.
-	2. parse and collect results into a dictionary.
-	"
-	| macros fileReference binaryReference result |
-
-	logger trace: aCollection.
-
-	macros := OrderedDictionary new.
-	fileReference := self generateCFileWith: aCollection.
-	binaryReference := self compileCFile: fileReference.
-	result := self executeCommand: binaryReference.
-
-	result trimmed linesDo: [ :each | 
-		| macroName macroValue |
+		install.
 		
-		macroName := each copyUpTo: $=.
-		macroValue := each allButFirst: macroName size + 1.
-		logger trace: macroName.
-		macros 
-			at: macroName 
-			put: (self convert: macroValue) ].
+	generatedClassName := generatedClass name
+]
+
+{ #category : 'private' }
+CigPharoConstantsPoolGenerator >> collectConstantsToGenerate: aCollection [ 
+
+	"they are printable but not literals, I try to retrieve its value and 
+	 then reset source/printable status"
+	aCollection 
+		reject: [ :each | each isLiteral ] 
+		thenDo: [ :each | self retrieveLiteralConstantIn: each ].
 	
-	^ macros
+	"now I will have all macro printables with values solved (that I can use)"
+	^ aCollection select: [ :each | each isPrintable ]
 ]
 
 { #category : 'private' }
-CigPharoConstantsPoolGenerator >> collectSharedVariables: aCollection [
-		
-	^ aCollection 
-		collect: [ :each | each asSymbol ] 
-		as: Array
-]
-
-{ #category : 'private' }
-CigPharoConstantsPoolGenerator >> compileCFile: fileReference [
+CigPharoConstantsPoolGenerator >> compileCFileFrom: sourceReference [
 	| result binaryReference command |
 
-	logger trace: fileReference.
+	logger trace: sourceReference.
 
-	binaryReference := fileReference withoutExtension ensureDelete.
-	command := 'clang -std=c11 -Wall {3} {1} -o {2}' format: { 
-		fileReference basename. 
+	binaryReference := sourceReference withoutExtension ensureDelete.
+	command := 'clang {3} {1} -o {2}' format: { 
+		sourceReference basename. 
 		binaryReference basename.
 		String streamContents: [ :stream |
 			self file cIncludePathsAsArguments
@@ -146,45 +87,29 @@ CigPharoConstantsPoolGenerator >> compileCFile: fileReference [
 	CigCommandExecutor execute: command. 
 
 	^ binaryReference
-]
-
-{ #category : 'private' }
-CigPharoConstantsPoolGenerator >> convert: aString [
-
-	aString first = $" ifTrue: [
-		^ aString copyFrom: 2 to: (aString size - 1) ].
-
-	^ aString asNumber
-]
-
-{ #category : 'private' }
-CigPharoConstantsPoolGenerator >> executeCommand: binaryReference [
-
-	logger trace: binaryReference.
-	^ CigCommandExecutor execute: binaryReference fullName.	
-
+	
 ]
 
 { #category : 'generating' }
 CigPharoConstantsPoolGenerator >> generate [
 
-	^ self addClassWithConstants: #()
+	^ self addClass
 ]
 
 { #category : 'private' }
-CigPharoConstantsPoolGenerator >> generateCFileWith: aCollection [
+CigPharoConstantsPoolGenerator >> generateCFileFor: aMacroName [
 	| fileReference |
 
 	fileReference := (FileLocator temp 
 		/ 'CIG' 
-		/ (self file libraryName, '_constants')) 
+		/ 'macro_to_constant') 
 		withExtension: 'c'.
 	fileReference parent ensureCreateDirectory.
 	
 	fileReference 
 		ensureDelete;
 		writeStreamDo: [ :stream | 
-
+		
 			stream << '#import <stdio.h>'; lf.
 			
 			self file constantGenerator headers
@@ -202,37 +127,77 @@ CigPharoConstantsPoolGenerator >> generateCFileWith: aCollection [
 
 			stream << self class constantsTemplate; lf.
 			
-			stream << 'int main() {'; lf.
-			aCollection 
-				do: [ :each | 
-					stream tab. 
-					stream << 'print_macro(' << each << ');'; lf ] .
-			stream tab; << 'return 0;'; lf.
-			stream << '}'; lf ].
+			stream << 'int main() {'; lf; tab. 
+			stream << 'print_macro(' << aMacroName << ');'; lf; tab.
+			stream << 'return 0;'; lf.
+			stream << '}' ].
 
 	^ fileReference
 ]
 
 { #category : 'generating' }
 CigPharoConstantsPoolGenerator >> generateConstants: aCollection [
-	| macros |
+	| constantsToGenerate |
 
-	macros := self collectConstantValues: aCollection.
-	macros ifEmpty: [ ^ self ].
-	
-	self addClassWithConstants: macros keys sorted.
-	self addClassInitializationMethodConstants: macros.
-	self addClassAccessors: macros keys
-]
+	constantsToGenerate := self collectConstantsToGenerate: aCollection.
 
-{ #category : 'accessing' }
-CigPharoConstantsPoolGenerator >> generatedClass [
-
-	^ generatedClass
+	self groupStrategy 
+		addConstants: constantsToGenerate 
+		to: self libraryConstantsClass
+		in: self file
 ]
 
 { #category : 'private' }
-CigPharoConstantsPoolGenerator >> shouldPrintNumbersAsHex [
+CigPharoConstantsPoolGenerator >> generatedClass [
 
-	^ self file constantGenerator shouldPrintNumbersAsHex
+	^ self class environment classNamed: generatedClassName
+]
+
+{ #category : 'private' }
+CigPharoConstantsPoolGenerator >> groupStrategy [
+
+	^ self file constantGenerator groupStrategy
+]
+
+{ #category : 'private' }
+CigPharoConstantsPoolGenerator >> retrieveLiteralConstantIn: aMacroDefinition [
+	| sourceReference binaryReference result source |
+	
+	logger trace: aMacroDefinition.
+	
+	"if this is just a definition, it means 1, because 
+		#define SOMEMACRO 
+		is equivalent to 
+		#define SOMEMACRO 1"
+	aMacroDefinition source isEmptyOrNil
+		ifTrue: [ 
+			aMacroDefinition updateSourceWith: '1'.
+			^ self ].
+	
+	sourceReference := self generateCFileFor: aMacroDefinition name.
+	[ binaryReference := self compileCFileFrom: sourceReference ]
+	on: CigCommandExecutionError 
+	do: [ :e |
+		logger info: 'Skipping ', aMacroDefinition name, ': TYPE NOT SUPPORTED'.
+		logger error: e.
+		aMacroDefinition makeNotPrintable.
+		^ self ].
+	
+	result := (CigCommandExecutor execute: binaryReference fullName) trimmed.
+	result 
+		ifNotEmpty: [ 
+			| newSource |
+			newSource  := (result trimmed substrings: '=') second. 
+			(newSource isNotEmpty and: [ (newSource  ~= '[CIGUNSUPORTED]') ])
+				ifTrue: [
+					"ok, we have a real value"
+					aMacroDefinition updateSourceWith: newSource ]
+				ifFalse: [
+					"program worked, but I do not have a result"
+					logger info: 'Skipping ', aMacroDefinition name, ': TYPE NOT SUPPORTED'.
+					aMacroDefinition makeNotPrintable ] ]
+		ifEmpty: [ 
+			"for some reason program didn't answer anything (this should not happen)"
+			logger info: 'Skipping ', aMacroDefinition name, ': NOT PRINTABLE (UNKNOWN REASONS)'.
+			aMacroDefinition makeNotPrintable ]
 ]

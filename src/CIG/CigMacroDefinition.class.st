@@ -6,7 +6,8 @@ Class {
 		'isFunctionLike',
 		'source',
 		'isPrintable',
-		'isLiteral'
+		'isLiteral',
+		'originSource'
 	],
 	#category : 'CIG-Node',
 	#package : 'CIG',
@@ -38,27 +39,45 @@ CigMacroDefinition >> fromCursor: aCursor [
 	super fromCursor: aCursor.
 	
 	name ifNil: [ name := aCursor displayName ].
-	
+		
 	isBuiltin := aCursor isMacroBuiltin.
 	isFunctionLike := aCursor isMacroFunctionLike.
+	isLiteral := false.
+	isPrintable := false.
 
 	"fast exit to not calculate the tokens of everything"
-	isFunctionLike ifTrue: [
-		source := #().
-		isLiteral := false.
-		isPrintable := false.
-		^ self ].
-	"get tokens"
+	isFunctionLike ifTrue: [ ^ self ].
+
+	"I am going to try as printable anything that is not a function like. 
+	 This is questionable, but I the generator will try to get the real printable 
+	 value after"
+	isPrintable := true.
+
+	"get source"
+	originSource := aCursor source ifNotNil: [ :aString | (aString allButFirst: name size) trimmed ]. 
+	
+	"get tokens to see if this is a literal"
 	aCursor withSourceTokensDo: [ :tokens :numTokens :unit |
-		source := tokens allButFirst collect: [ :each | unit tokenSpelling: each ].
-		isLiteral := tokens second isLiteral.
-		isPrintable := isLiteral and: [ numTokens > 1 ] ]
+		tokens size = 2 ifTrue: [
+			isLiteral := tokens second isLiteral ] ].
+]
+
+{ #category : 'testing' }
+CigMacroDefinition >> isEmptyDefinition [
+
+	^ self originSource isEmptyOrNil
 ]
 
 { #category : 'testing' }
 CigMacroDefinition >> isFunctionLike [
 
 	^ isFunctionLike
+]
+
+{ #category : 'testing' }
+CigMacroDefinition >> isLiteral [
+
+	^ isLiteral
 ]
 
 { #category : 'testing' }
@@ -74,7 +93,27 @@ CigMacroDefinition >> isPrintable [
 ]
 
 { #category : 'accessing' }
+CigMacroDefinition >> makeNotPrintable [
+
+	isPrintable := false
+]
+
+{ #category : 'accessing' }
+CigMacroDefinition >> originSource [
+
+	^ originSource
+]
+
+{ #category : 'accessing' }
 CigMacroDefinition >> source [
 
-	^ source
+	^ source ifNil: [ originSource ]
+]
+
+{ #category : 'initialization' }
+CigMacroDefinition >> updateSourceWith: aString [
+	"in generation step, we can update the source of a macro with a calculated value. 
+	 this will set the source but keep originSource intact (so we can use it later)"
+
+	source := aString
 ]
