@@ -106,6 +106,33 @@ CigPharoStructureTemplateTest >> testGenerateStructWithStructure [
 ]
 
 { #category : 'tests' }
+CigPharoStructureTemplateTest >> testGenerateStructWithTwoStructures [
+	| unit element template |
+	unit := self newUnit: '
+struct a;
+struct b {
+    struct a* first;
+    int b;
+    int c;
+    struct a* second;
+}'.
+
+	element := unit elements second.
+	template := element phTemplate.
+	
+	self 
+		assert: template generateFieldsDesc
+		equals:  'fieldsDesc
+
+	^ #(
+	a* first;
+	int b;
+	int c;
+	a* second
+	)'
+]
+
+{ #category : 'tests' }
 CigPharoStructureTemplateTest >> testGenerateStructWithTypedefWithPointerToStructure [
 	| element template |
 

@@ -261,12 +261,14 @@ CigTranslatedUnit >> generateFrom: aHeader [
 	logger trace: excluding.
 	logger trace: includingPaths.
 	logger trace: excludingPaths.
-		
+	
 	self preprocess: aHeader.
 	aHeader imports valuesDo: [ :each |
 		self generateTarget: each from: aHeader ].
 	variadics keysAndValuesDo: [ :aSelector :aDeclaration |
-		self addElement: (CigVariadic newDeclaration: aDeclaration selector: aSelector) ]
+		self addElement: (CigVariadic newDeclaration: aDeclaration selector: aSelector) ].
+		
+	aHeader elementGenerator postProcess: self
 ]
 
 { #category : 'generating' }
@@ -312,6 +314,16 @@ CigTranslatedUnit >> generateTarget: aTarget from: aHeader [
 CigTranslatedUnit >> hasElements [
 
 	^ elements notNil
+]
+
+{ #category : 'accessing' }
+CigTranslatedUnit >> indexOfElementOfSameKind: anElement [
+	"selects elements of same type of anElement and answer the index of 
+	 in in such collection (this is useful to name anonymous structs/unions/enums)" 
+
+	^ (self elements
+		select: [ :each | each kind = anElement kind ]) 
+		indexOf: anElement
 ]
 
 { #category : 'initialization' }
@@ -512,7 +524,7 @@ CigTranslatedUnit >> nameFor: anElement [
 { #category : 'accessing' }
 CigTranslatedUnit >> nameGenerator [
 
-	^ nameGenerator ifNil: [ nameGenerator := CigNameGenerator new ]
+	^ nameGenerator
 ]
 
 { #category : 'accessing' }
@@ -614,6 +626,12 @@ CigTranslatedUnit >> removeAllUnknowns [
 
 	self traverseElementsDo: [ :eachElement | 
 		eachElement elements removeAll: (eachElement elements select: [ :each | each isUnknown ]) ]
+]
+
+{ #category : 'accessing' }
+CigTranslatedUnit >> removeElement: anElement [
+
+	self elements remove: anElement ifAbsent: []
 ]
 
 { #category : 'private' }

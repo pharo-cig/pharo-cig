@@ -23,8 +23,15 @@ CigPharoStructureTemplate >> anonymousTypeName [
 	| index |
 	
 	index := self indexOfElement.
-	^ String streamContents: [ :stream | | decl |
-		decl := self element parent phDeclaration.
+	^ String streamContents: [ :stream | | decl parent  |
+		parent := self element parent.
+		decl := parent isUnit
+			ifTrue: [ 
+				parent prefix capitalized ]
+			ifFalse: [ 
+				parent isAnonymous 
+					ifTrue: [ parent phTemplate anonymousTypeName ]
+					ifFalse: [ parent phDeclaration ] ].
 		stream << decl.
 		"if parent is named with underscores, strategy will be add an underscore,
 		 otherwise capitalize it"

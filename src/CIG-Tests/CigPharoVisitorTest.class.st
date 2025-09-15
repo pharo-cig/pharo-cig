@@ -668,6 +668,81 @@ CigPharoVisitorTest >> testVisitNamespaceAddsNamespaceWithPrefix [
 	self assert: class notNil
 ]
 
+{ #category : 'tests' }
+CigPharoVisitorTest >> testVisitStructWithUnionAnonymousAndAnonymousWillRegisterType [
+	| unit visitor |
+
+	unit := self newUnit: '
+typedef struct struct_s {
+   int value_type;
+   int padding;
+   union {
+      int v_oid;
+      int v_int64;
+      int v_int32;
+      int v_int8;
+      double v_double;
+      bool v_bool;
+      int v_datetime;
+      struct  {
+         int timestamp;
+         int increment;
+      } v_timestamp;
+      struct {
+         char *str;
+         int len;
+      } v_utf8;
+      struct {
+         int *data;
+         int data_len;
+      } v_doc;
+      struct {
+         int *data;
+         int data_len;
+         int subtype;
+      } v_binary;
+      struct {
+         char *regex;
+         char *options;
+      } v_regex;
+      struct {
+         char *collection;
+         int collection_len;
+         int oid;
+      } v_dbpointer;
+      struct {
+         char *code;
+         int code_len;
+      } v_code;
+      struct {
+         char *code;
+         int *scope_data;
+         int code_len;
+         int scope_len;
+      } v_codewscope;
+      struct {
+         char *symbol;
+         int len;
+      } v_symbol;
+      int v_decimal128;
+   } value;
+} struct_t
+'.
+
+	visitor := CigPharoVisitor newForTest.	
+	visitor addBaseClasses: unit.
+	visitor visitStructure: unit elements first.
+	visitor endUnit: unit.
+	self 
+		assertCollection: ((Smalltalk classNamed: #UnitStructure) allSubclasses collect: #name)
+		hasSameElements: #(UnitStructSUnion1Struct1 UnitStructSUnion1Struct2 UnitStructSUnion1Struct3 UnitStructSUnion1Struct4 UnitStructSUnion1Struct5 UnitStructSUnion1Struct6 UnitStructSUnion1Struct7 UnitStructSUnion1Struct8 UnitStructSUnion1Struct9 UnitStructS).
+				
+	self 
+		assertCollection: ((Smalltalk classNamed: #UnitUnion) allSubclasses collect: #name)
+		hasSameElements: #(UnitStructSUnion1)
+
+]
+
 { #category : 'tests - struct' }
 CigPharoVisitorTest >> testVisitStructureGenerateSimpleStructure [
 	| element visitor class |

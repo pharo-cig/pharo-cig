@@ -469,6 +469,18 @@ CigElement >> printOn: stream [
 ]
 
 { #category : 'accessing' }
+CigElement >> remove [
+
+	self parent removeElement: self
+]
+
+{ #category : 'accessing' }
+CigElement >> removeElement: anElement [
+
+	self element remove: anElement ifAbsent: []
+]
+
+{ #category : 'accessing' }
 CigElement >> root [
 
 	^ self parent 

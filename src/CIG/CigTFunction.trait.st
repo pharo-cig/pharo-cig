@@ -31,7 +31,7 @@ CigTFunction >> buildParameters: aCollection on: stream [
 		stream << each name << ': ' << each name << ' ' ]
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'accessing' }
 CigTFunction >> buildParametersOn: stream [
 
 	^ self 
@@ -121,6 +121,12 @@ CigTFunction >> isOperator [
 ]
 
 { #category : 'testing' }
+CigTFunction >> isReturnTypeCharPointer [
+
+	^ self returnTypeName reject: [ :each | each isSeparator ] = 'char*'
+]
+
+{ #category : 'testing' }
 CigTFunction >> isReturnTypeVoid [
 
 	^ self returnTypeName = 'void'
@@ -130,6 +136,17 @@ CigTFunction >> isReturnTypeVoid [
 CigTFunction >> isVariadic [
 
 	^ isVariadic
+]
+
+{ #category : 'accessing' }
+CigTFunction >> makeReturnVoidPointer [
+	"Some times I need to force this because the C library will answer a char* 
+	 but it expect the user to free it. Since uFFI will auto-convert the string 
+	 to its external representation we will lose the pointer to later free it.
+	 In those cases, I need to get a void* as a result, which will let me complete 
+	 the cycle"
+	 
+	 returnTypeName := 'void *'
 ]
 
 { #category : 'accessing' }

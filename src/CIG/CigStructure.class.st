@@ -6,7 +6,8 @@ Class {
 	#instVars : [
 		'comment',
 		'isPublic',
-		'isAnonymous'
+		'isAnonymous',
+		'forceOpaque'
 	],
 	#category : 'CIG-Node',
 	#package : 'CIG',
@@ -82,7 +83,7 @@ CigStructure >> canBeExported [
 	"skip if not public (it can be nested in a class)"
 	self isPublic ifFalse: [ ^ false ].
 	"skip if is annonymous and top level (root, not nested) for now at least"
-	(self isAnonymous and: [ self isNested not]) ifTrue: [ ^ false ].
+	"(self isAnonymous and: [ self isNested not]) ifTrue: [ ^ false ]."
 	"skip if is template specialization"
 	self isTemplateSpecialization ifTrue: [ ^ false ].
 	"if it does not have anyfield (but is not a class), it can't be exported"
@@ -159,6 +160,13 @@ CigStructure >> hasFields [
 	^ self fields notEmpty
 ]
 
+{ #category : 'initialization' }
+CigStructure >> initialize [
+
+	forceOpaque := false.
+	super initialize
+]
+
 { #category : 'testing' }
 CigStructure >> isAbstract [
 
@@ -171,11 +179,17 @@ CigStructure >> isAnonymous [
 	^ isAnonymous
 ]
 
-{ #category : 'private' }
+{ #category : 'private - testing' }
 CigStructure >> isAnonymousMatchingLocation: aString [
 
 	^ (CigType extractAnonymousLocation: self name) = (CigType extractAnonymousLocation: aString)
 
+]
+
+{ #category : 'private - testing' }
+CigStructure >> isAnonymousName: aString [
+
+	^ aString = self anonymousName
 ]
 
 { #category : 'testing' }
@@ -190,8 +204,11 @@ CigStructure >> isClass [
 CigStructure >> isEqualToPath: aString [
 
 	^ self isAnonymous 
-		ifTrue: [ self isAnonymousMatchingLocation: aString ]
-		ifFalse: [ super isEqualToPath: aString ]
+		ifTrue: [ 
+			(self isAnonymousName: aString)
+			or: [ self isAnonymousMatchingLocation: aString ] ]
+		ifFalse: [ 
+			super isEqualToPath: aString ]
 ]
 
 { #category : 'testing' }
@@ -203,7 +220,7 @@ CigStructure >> isNested [
 { #category : 'testing' }
 CigStructure >> isOpaque [
 
-	^ elements isNil
+	^ forceOpaque or: [ elements isNil ]
 ]
 
 { #category : 'testing' }
@@ -232,6 +249,12 @@ CigStructure >> isTemplateSpecialization [
 ]
 
 { #category : 'accessing' }
+CigStructure >> makeOpaque [
+
+	forceOpaque := true
+]
+
+{ #category : 'accessing' }
 CigStructure >> pathName [
 
 	^ self isAnonymous 
@@ -257,6 +280,14 @@ CigStructure >> resolveType [
 			parent: self;
 			yourself);
 		yourself
+]
+
+{ #category : 'accessing' }
+CigStructure >> sanitizedName [
+
+	^ self isAnonymous
+		ifTrue: [ self anonymousName ]
+		ifFalse: [ super sanitizedName ]
 ]
 
 { #category : 'accessing' }

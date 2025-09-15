@@ -276,6 +276,7 @@ CigPharoVisitor >> visitNamespace: aNamespace [
 
 { #category : 'visiting' }
 CigPharoVisitor >> visitStructure: aStructure [
+
 	logger trace: aStructure.
 
 	aStructure canBeExported ifFalse: [ 

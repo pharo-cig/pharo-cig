@@ -42,6 +42,7 @@ Class {
 		'winLibraryName',
 		'packageName',
 		'nameGenerator',
+		'elementGenerator',
 		'withBaseline',
 		'variadics',
 		'withConstants',
@@ -284,6 +285,12 @@ CigLibraryGenerator >> diagnostics [
 	"makes a tree of elements I can use to generate the wrapper file and classes."
 
 	^ self newTranslatedUnit diagnosticsFrom: self
+]
+
+{ #category : 'accessing' }
+CigLibraryGenerator >> elementGenerator [
+
+	^ elementGenerator ifNil: [ elementGenerator := CigElementGenerator new ]
 ]
 
 { #category : 'accessing - scripting' }
@@ -647,8 +654,7 @@ CigLibraryGenerator >> withClasses [
 { #category : 'accessing - scripting' }
 CigLibraryGenerator >> withConstantGenerator: aBlock [
 
-	constantGenerator ifNil: [ constantGenerator := CigConstantGenerator new ].
-	aBlock value: constantGenerator
+	aBlock value: self constantGenerator
 ]
 
 { #category : 'accessing - configuration' }
@@ -663,10 +669,15 @@ CigLibraryGenerator >> withConstants [
 ]
 
 { #category : 'accessing - scripting' }
+CigLibraryGenerator >> withElementGenerator: aBlock [
+
+	aBlock value: self elementGenerator
+]
+
+{ #category : 'accessing - scripting' }
 CigLibraryGenerator >> withNameGenerator: aBlock [
 
-	nameGenerator ifNil: [ nameGenerator := CigNameGenerator new ].
-	aBlock value: nameGenerator
+	aBlock value: self nameGenerator
 ]
 
 { #category : 'accessing - configuration' }

@@ -83,7 +83,9 @@ CigConstantGeneratorGroupStrategy >> literalValueOf: aString [
 	(literal first = $-) 		ifTrue: [ ^ self toNumberLiteral: literal ].
 	(literal first = $") 		ifTrue: [ ^ '''', (self literalStringToInternal: literal), '''' ].
 	(literal first = $') 		ifTrue: [ ^ '$', literal second asString ].
-	
+	(literal = 'inf') 			ifTrue: [ ^ 'Float infinity' ].
+	(literal = 'nan') 			ifTrue: [ ^ 'nil' ].
+
 	self error: 'Invalid macro literal: ', aString
 ]
 
