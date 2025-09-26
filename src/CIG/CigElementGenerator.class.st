@@ -5,7 +5,8 @@ Class {
 	#name : 'CigElementGenerator',
 	#superclass : 'Object',
 	#instVars : [
-		'transforms'
+		'transforms',
+		'globalTransforms'
 	],
 	#category : 'CIG-Base',
 	#package : 'CIG',
@@ -16,7 +17,28 @@ Class {
 CigElementGenerator >> initialize [
 
 	super initialize.
-	transforms := Dictionary new
+	globalTransforms := OrderedCollection new.
+	transforms := OrderedDictionary new
+]
+
+{ #category : 'accessing' }
+CigElementGenerator >> makeAllFunctionsReturningStringReturnPointer [
+
+	self withUnitDo: [ :aUnit | 
+		aUnit elements 
+			select: [ :each | each isFunction and: [ each isReturnTypeCharPointer ] ]
+			thenDo: [ :each | each makeReturnVoidPointer ] ]
+]
+
+{ #category : 'accessing' }
+CigElementGenerator >> makeFunctionReturnPointer: aName [
+	"Forces a void* return on a function. 
+	 This is useful because a function can answer a char* (a string) and expect 
+	 that you free it, but uFFI will automatically convert that return into a 
+	 internal `String`, making it impossible to free it after.
+	 See also `CigElementGenerator>>#makeAllFunctionsReturningStringReturnPointer`"
+
+	self withName: aName do: [ :anElement | anElement makeReturnVoidPointer ]
 ]
 
 { #category : 'accessing' }
@@ -34,6 +56,9 @@ CigElementGenerator >> makeStructureOpaque: aName [
 { #category : 'accessing' }
 CigElementGenerator >> postProcess: aUnit [
  
+ 	globalTransforms 
+ 		do: [ :each | each value: aUnit ].
+ 
 	transforms keysAndValuesDo: [ :aName :aBlock | 
 		aUnit elements 
 			detect: [ :each | each name = aName ] 
@@ -50,4 +75,10 @@ CigElementGenerator >> removeElement: aName [
 CigElementGenerator >> withName: aName do: aBlock [
 
 	transforms at: aName put: aBlock
+]
+
+{ #category : 'accessing' }
+CigElementGenerator >> withUnitDo: aBlock [ 
+
+	globalTransforms add: aBlock
 ]

@@ -161,43 +161,36 @@ CigPharoConstantsPoolGenerator >> groupStrategy [
 
 { #category : 'private' }
 CigPharoConstantsPoolGenerator >> retrieveLiteralConstantIn: aMacroDefinition [
+
 	| sourceReference binaryReference result source |
-	
-	logger trace: aMacroDefinition.
-	
-	"if this is just a definition, it means 1, because 
+	logger trace: aMacroDefinition. "if this is just a definition, it means 1, because 
 		#define SOMEMACRO 
 		is equivalent to 
 		#define SOMEMACRO 1"
-	aMacroDefinition source isEmptyOrNil
-		ifTrue: [ 
+	aMacroDefinition source isEmptyOrNil ifTrue: [
 			aMacroDefinition updateSourceWith: '1'.
 			^ self ].
-	
+
 	sourceReference := self generateCFileFor: aMacroDefinition name.
 	[ binaryReference := self compileCFileFrom: sourceReference ]
-	on: CigCommandExecutionError 
-	do: [ :e |
-		logger info: 'Skipping ', aMacroDefinition name, ': TYPE NOT SUPPORTED'.
-		logger error: e.
-		aMacroDefinition makeNotPrintable.
-		^ self ].
-	
-	result := (CigCommandExecutor execute: binaryReference fullName) trimmed.
-	result 
-		ifNotEmpty: [ 
-			| newSource |
-			newSource  := (result trimmed substrings: '=') second. 
-			(newSource isNotEmpty and: [ (newSource  ~= '[CIGUNSUPORTED]') ])
-				ifTrue: [
-					"ok, we have a real value"
-					aMacroDefinition updateSourceWith: newSource ]
-				ifFalse: [
-					"program worked, but I do not have a result"
-					logger info: 'Skipping ', aMacroDefinition name, ': TYPE NOT SUPPORTED'.
-					aMacroDefinition makeNotPrintable ] ]
-		ifEmpty: [ 
-			"for some reason program didn't answer anything (this should not happen)"
-			logger info: 'Skipping ', aMacroDefinition name, ': NOT PRINTABLE (UNKNOWN REASONS)'.
-			aMacroDefinition makeNotPrintable ]
+		on: CigCommandExecutionError
+		do: [ :e |
+				logger info: 'Skipping ' , aMacroDefinition name , ': TYPE NOT SUPPORTED'.
+				logger error: e.
+				aMacroDefinition makeNotPrintable.
+				^ self ].
+
+	result := (CigCommandExecutor execute: binaryReference fullName) trimBoth.
+	result
+		ifNotEmpty: [
+				| newSource |
+				newSource := (result trimBoth substrings: '=') second.
+				(newSource isNotEmpty and: [ newSource ~= '[CIGUNSUPORTED]' ])
+					ifTrue: [ "ok, we have a real value" aMacroDefinition updateSourceWith: newSource ]
+					ifFalse: [ "program worked, but I do not have a result"
+							logger info: 'Skipping ' , aMacroDefinition name , ': TYPE NOT SUPPORTED'.
+							aMacroDefinition makeNotPrintable ] ]
+		ifEmpty: [ "for some reason program didn't answer anything (this should not happen)"
+				logger info: 'Skipping ' , aMacroDefinition name , ': NOT PRINTABLE (UNKNOWN REASONS)'.
+				aMacroDefinition makeNotPrintable ]
 ]

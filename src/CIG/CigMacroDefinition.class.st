@@ -37,29 +37,19 @@ CigMacroDefinition >> acceptNameGenerator: aVisitor [
 CigMacroDefinition >> fromCursor: aCursor [
 
 	super fromCursor: aCursor.
-	
+
 	name ifNil: [ name := aCursor displayName ].
-		
+
 	isBuiltin := aCursor isMacroBuiltin.
 	isFunctionLike := aCursor isMacroFunctionLike.
 	isLiteral := false.
-	isPrintable := false.
-
-	"fast exit to not calculate the tokens of everything"
-	isFunctionLike ifTrue: [ ^ self ].
-
-	"I am going to try as printable anything that is not a function like. 
+	isPrintable := false. "fast exit to not calculate the tokens of everything"
+	isFunctionLike ifTrue: [ ^ self ]. "I am going to try as printable anything that is not a function like. 
 	 This is questionable, but I the generator will try to get the real printable 
 	 value after"
-	isPrintable := true.
-
-	"get source"
-	originSource := aCursor source ifNotNil: [ :aString | (aString allButFirst: name size) trimmed ]. 
-	
-	"get tokens to see if this is a literal"
-	aCursor withSourceTokensDo: [ :tokens :numTokens :unit |
-		tokens size = 2 ifTrue: [
-			isLiteral := tokens second isLiteral ] ].
+	isPrintable := true. "get source"
+	originSource := aCursor source ifNotNil: [ :aString | (aString allButFirst: name size) trimBoth ]. "get tokens to see if this is a literal"
+	aCursor withSourceTokensDo: [ :tokens :numTokens :unit | tokens size = 2 ifTrue: [ isLiteral := tokens second isLiteral ] ]
 ]
 
 { #category : 'testing' }

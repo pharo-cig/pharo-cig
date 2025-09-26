@@ -123,7 +123,7 @@ CigTFunction >> isOperator [
 { #category : 'testing' }
 CigTFunction >> isReturnTypeCharPointer [
 
-	^ self returnTypeName reject: [ :each | each isSeparator ] = 'char*'
+	^ (self returnTypeName reject: [ :each | each isSeparator ]) = 'char*'
 ]
 
 { #category : 'testing' }
