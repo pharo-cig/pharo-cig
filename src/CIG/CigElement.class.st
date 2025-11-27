@@ -196,7 +196,7 @@ CigElement >> fullNameWith: delim [
 { #category : 'comparing' }
 CigElement >> hash [
 
-	^ self species hash bitXor: self  hash
+	^ self species hash bitXor: self basicName hash
 ]
 
 { #category : 'accessing' }
