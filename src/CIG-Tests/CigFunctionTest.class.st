@@ -7,6 +7,27 @@ Class {
 }
 
 { #category : 'tests' }
+CigFunctionTest >> testFunctionWithBooleanAsReturnWillBeParsedAsBooleanAndNotInt [
+	"this error emerged while parsing mongoc"
+	| unit element |
+	
+	unit := CigCLibraryGenerator new 
+		packageName: 'Unit';
+		prefix: 'Unit';
+		importUnit: '
+typedef Boolean bool;
+bool mongoc_function_definition ();';
+		translateUnit.	
+
+	self denyEmpty: unit elements.
+	
+	element := unit findElementMatching: [ :each | each name = 'mongoc_function_definition()' ].
+	
+	self deny: element isNil.
+	self assert: element returnTypeName equals: 'bool'
+]
+
+{ #category : 'tests' }
 CigFunctionTest >> testFunctionWithDefineAtTheEndWillBeRead [
 	| unit |
 	
