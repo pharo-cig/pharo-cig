@@ -527,6 +527,13 @@ CigTranslatedUnit >> nameGenerator [
 	^ nameGenerator
 ]
 
+{ #category : 'private' }
+CigTranslatedUnit >> nameGenerator: aNameGenerator [
+	"this is used mainly for testing"
+
+	nameGenerator := aNameGenerator
+]
+
 { #category : 'accessing' }
 CigTranslatedUnit >> namespaces [
 

@@ -220,11 +220,8 @@ CigStructure >> isNested [
 { #category : 'testing' }
 CigStructure >> isOpaque [
 
-	"apparently, I need a lazy initialization because CigStructure can be instantiated without 
-	 calling #initialize ?"
-	forceOpaque ifNil: [ forceOpaque := false ].
-	
-	^ forceOpaque or: [ elements isNil ]
+	"forceOpaque can be not initialized"
+	^ (forceOpaque == true) or: [ elements isNil ]
 ]
 
 { #category : 'testing' }
