@@ -9,6 +9,14 @@ Class {
 	#tag : 'Constant'
 }
 
+{ #category : 'instance creation' }
+CigConstantGeneratorByPrefixStrategy class >> newPrefixLetters: aString [
+
+	^ self new 
+		prefixLetters: aString;
+		yourself
+]
+
 { #category : 'generating' }
 CigConstantGeneratorByPrefixStrategy >> addConstants: aCollectionOfMacroDefinitions to: aConstantClass [
 	
@@ -44,4 +52,16 @@ CigConstantGeneratorByPrefixStrategy >> addConstants: aCollectionOfMacroDefiniti
 		updateClass: aConstantClass 
 		with: [ :aBuilder | 
 			aBuilder sharedPools: (classes collect: #name as: Array) sorted ]
+]
+
+{ #category : 'accessing' }
+CigConstantGeneratorByPrefixStrategy >> prefixLetters [
+
+	^ prefixLetters
+]
+
+{ #category : 'accessing' }
+CigConstantGeneratorByPrefixStrategy >> prefixLetters: aString [
+
+	prefixLetters := aString
 ]

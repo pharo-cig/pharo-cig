@@ -64,6 +64,7 @@ CigPharoConstantsPoolGeneratorTest >> testCollectConstantValues [
 		yourself.
 		
 	unit := file translateUnit.
+	file constantGenerator preferDecimal.
 
 	gen := CigPharoConstantsPoolGenerator newFile: file unit: unit. 
 
@@ -164,7 +165,9 @@ CigPharoConstantsPoolGeneratorTest >> testIgnoreConstantThatExpandsToAFunction [
 CigPharoConstantsPoolGeneratorTest >> testLiteralValueOf [
 	| gen |
 
-	gen := CigConstantGeneratorGroupStrategy new.
+	gen := CigConstantGeneratorGroupStrategy new
+		configureWith: CigConstantGenerator new;
+		yourself.
 	
 	self assert: (gen literalValueOf: '0x2A') equals: '16r2A'.
 	self assert: (gen literalValueOf: '0b101010') equals: '2r101010'.

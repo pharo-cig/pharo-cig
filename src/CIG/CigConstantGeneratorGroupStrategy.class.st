@@ -2,8 +2,7 @@ Class {
 	#name : 'CigConstantGeneratorGroupStrategy',
 	#superclass : 'Object',
 	#instVars : [
-		'preferHexadecimal',
-		'ignoreEmptyDefinitions'
+		'constantGenerator'
 	],
 	#category : 'CIG-Constant',
 	#package : 'CIG',
@@ -54,6 +53,12 @@ CigConstantGeneratorGroupStrategy >> collectSharedVariables: aCollection [
 		as: Array
 ]
 
+{ #category : 'configuring' }
+CigConstantGeneratorGroupStrategy >> configureWith: aConstantGenerator [
+
+	constantGenerator := aConstantGenerator
+]
+
 { #category : 'private' }
 CigConstantGeneratorGroupStrategy >> literalStringToInternal: aString [
 
@@ -92,13 +97,13 @@ CigConstantGeneratorGroupStrategy >> literalValueOf: aString [
 { #category : 'private' }
 CigConstantGeneratorGroupStrategy >> shouldIgnoreEmptyDefinitions [
 
-	^ ignoreEmptyDefinitions
+	^ constantGenerator 
 ]
 
 { #category : 'private' }
 CigConstantGeneratorGroupStrategy >> shouldPreferHexadecimal [
 
-	^ preferHexadecimal
+	^ constantGenerator shouldPreferHexadecimal
 ]
 
 { #category : 'private' }

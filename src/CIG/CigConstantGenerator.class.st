@@ -30,6 +30,8 @@ CigConstantGenerator >> addHeader: aString [
 CigConstantGenerator >> doNotGroup [
 
 	groupStrategy := CigConstantGeneratorNoGroupStrategy new
+		configureWith: self;
+		yourself
 ]
 
 { #category : 'accessing - scripting' }
@@ -66,6 +68,8 @@ CigConstantGenerator >> excludeMacros: aCollection [
 CigConstantGenerator >> groupByHeader [
 
 	groupStrategy := CigConstantGeneratorByHeaderStrategy new
+		configureWith: self;
+		yourself	
 ]
 
 { #category : 'accessing' }

@@ -29,6 +29,7 @@ CigConstantGeneratorByHeaderStrategy >> addConstants: aCollectionOfMacroDefiniti
 		className := aConstantClass name, 
 			(aLibraryGenerator nameGenerator applyCamelCaseTo: aName) capitalized.
 		groupClass := CigConstantGeneratorNoGroupStrategy new 
+			configureWith: self;
 			addConstants: aCollection 
 			to: ((SharedPool << className asSymbol)
 				tag: aConstantClass packageTagName;
