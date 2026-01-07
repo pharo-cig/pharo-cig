@@ -75,7 +75,9 @@ CigConstantGenerator >> groupByHeader [
 { #category : 'accessing' }
 CigConstantGenerator >> groupByPrefix: aNumber [
 
-	groupStrategy := CigConstantGeneratorByPrefixStrategy newPrefixLetters: aNumber
+	groupStrategy := (CigConstantGeneratorByPrefixStrategy newPrefixLetters: aNumber)
+		configureWith: self;
+		yourself
 ]
 
 { #category : 'accessing' }
