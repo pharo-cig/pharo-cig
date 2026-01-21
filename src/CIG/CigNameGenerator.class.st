@@ -179,8 +179,9 @@ CigNameGenerator >> visitElement: anElement [
 CigNameGenerator >> visitFunction: anElement [
 
 	^ (String streamContents: [ :stream |
-			   stream << (self applyFunctionModifiersTo: anElement sanitizedName in: anElement).
-			   anElement buildParametersOn: stream ]) trimBoth
+			stream << (self applyFunctionModifiersTo: anElement sanitizedName in: anElement).
+			anElement buildParametersOn: stream ]) 
+		trimBoth
 ]
 
 { #category : 'visiting' }

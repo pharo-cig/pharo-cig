@@ -175,7 +175,10 @@ CigPharoConstantsPoolGeneratorTest >> testLiteralValueOf [
 	self assert: (gen literalValueOf: '0') equals: '0'.
 	self assert: (gen literalValueOf: '"Hello, World"') equals: '''Hello, World'''.
 	self assert: (gen literalValueOf: '"Hello, ''World''"') equals: '''Hello, ''''World'''''''.
-	self assert: (gen literalValueOf: '''A''') equals: '$A'
+	self assert: (gen literalValueOf: '''A''') equals: '$A'.	
+	self assert: (gen literalValueOf: '0.01') equals: '0.01'.
+	self assert: (gen literalValueOf: '0.01F') equals: '0.01'.
+	
 ]
 
 { #category : 'tests' }

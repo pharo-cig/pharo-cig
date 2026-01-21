@@ -2,9 +2,7 @@ Class {
 	#name : 'CigConstantGeneratorGroupStrategy',
 	#superclass : 'Object',
 	#instVars : [
-		'constantGenerator',
-		'preferHexadecimal',
-		'ignoreEmptyDefinitions'
+		'constantGenerator'
 	],
 	#category : 'CIG-Constant',
 	#package : 'CIG',
@@ -19,9 +17,6 @@ CigConstantGeneratorGroupStrategy >> addConstants: aCollection to: aConstantClas
 
 { #category : 'generating' }
 CigConstantGeneratorGroupStrategy >> addConstants: aCollectionOfMacroDefinitions to: aConstantClass in: aLibraryGenerator [
-
-	preferHexadecimal := aLibraryGenerator constantGenerator shouldPreferHexadecimal.
-	ignoreEmptyDefinitions := aLibraryGenerator constantGenerator shouldIgnoreEmptyDefinitions.
 
 	^ self 
 		addConstants: aCollectionOfMacroDefinitions 
@@ -85,8 +80,8 @@ CigConstantGeneratorGroupStrategy >> literalValueOf: aString [
 	(literal beginsWith: '0X') 	ifTrue: [ ^ '16r', (literal allButFirst: 2) ].
 	(literal beginsWith: '0b') 	ifTrue: [ ^ '2r', (literal allButFirst: 2) ].
 	(literal beginsWith: '0B') 	ifTrue: [ ^ '2r', (literal allButFirst: 2) ].
-	(literal beginsWith: '0') 	ifTrue: [ ^ '8r', (literal allButFirst) ].
-	(literal first isDigit) 	ifTrue: [ ^ self toNumberLiteral: literal ].
+	((literal beginsWith: '0') and: [ (literal beginsWith: '0.') not ]) ifTrue: [ ^ '8r', (literal allButFirst) ].
+	(literal first isDigit) 		ifTrue: [ ^ self toNumberLiteral: literal ].
 	(literal first = $-) 		ifTrue: [ ^ self toNumberLiteral: literal ].
 	(literal first = $") 		ifTrue: [ ^ '''', (self literalStringToInternal: literal), '''' ].
 	(literal first = $') 		ifTrue: [ ^ '$', literal second asString ].
@@ -99,7 +94,7 @@ CigConstantGeneratorGroupStrategy >> literalValueOf: aString [
 { #category : 'private' }
 CigConstantGeneratorGroupStrategy >> shouldIgnoreEmptyDefinitions [
 
-	^ constantGenerator 
+	^ constantGenerator shouldIgnoreEmptyDefinitions
 ]
 
 { #category : 'private' }
@@ -114,7 +109,10 @@ CigConstantGeneratorGroupStrategy >> toNumberLiteral: aString [
 
 	number := NumberParser parse: aString.
 
-	number isFloat ifTrue: [ ^ aString ].
+	number isFloat ifTrue: [ 
+		^ (aString last asUppercase = $F)
+			ifTrue: [ aString allButLast ]
+			ifFalse: [ aString ] ].
 	(self shouldPreferHexadecimal not 
 		or: [ number abs < 16 ]) 
 		ifTrue: [ ^ aString ]. 
