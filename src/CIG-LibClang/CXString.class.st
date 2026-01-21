@@ -8,7 +8,7 @@ Class {
 { #category : 'accessing' }
 CXString >> cString [
 
-	^ self clang_getCString copy
+	^ self clang_getCString utf8StringFromCString
 ]
 
 { #category : 'private' }
@@ -20,7 +20,7 @@ CXString >> clang_disposeString [
 { #category : 'private' }
 CXString >> clang_getCString [
 
-	^ self ffiCall: #(char *clang_getCString(self))
+	^ self ffiCall: #(void *clang_getCString(self))
 ]
 
 { #category : 'accessing' }
