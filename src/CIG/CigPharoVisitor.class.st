@@ -27,8 +27,10 @@ CigPharoVisitor >> addBaseClasses: aUnit [
 
 { #category : 'private' }
 CigPharoVisitor >> addDeclaredConstants: aUnit [
-
-	(CigPharoConstantsPoolGenerator newFile: self file unit: aUnit) generateConstants: self constants
+	| generator |
+	
+	generator := CigPharoConstantsPoolGenerator newFile: self file unit: aUnit.
+	generator generateConstants: self constants
 ]
 
 { #category : 'private' }
@@ -89,7 +91,8 @@ CigPharoVisitor >> disableRegisterChangesDuring: aBlock [
 CigPharoVisitor >> endUnit: aUnit [
 
 	self addDeclaredTypesToTypedef: aUnit.
-	self addDeclaredConstants: aUnit.
+	self file hasConstants 
+		ifTrue: [ self addDeclaredConstants: aUnit ].
 	self executeInitializations
 ]
 
@@ -138,15 +141,18 @@ CigPharoVisitor >> executeInitializations [
 
 { #category : 'private' }
 CigPharoVisitor >> registerDeclaration: aDeclaration as: aString [
+	| declarationName |
 
 	"with apply of naming conventions, etc. It may happen that declaration now is 
 	 equal to the type... we skip this."	
 	aDeclaration = aString ifTrue: [ ^ self ].
 
+	declarationName := ((aDeclaration endsWith: '*')
+		ifTrue: [ aDeclaration allButLast ]
+		ifFalse: [ aDeclaration ]). 
+	
 	types 
-		at: ((aDeclaration endsWith: '*')
-			ifTrue: [ aDeclaration allButLast ]
-			ifFalse: [ aDeclaration ])
+		at: declarationName
 		put: aString
 ]
 
@@ -239,11 +245,10 @@ CigPharoVisitor >> visitFunction: aFunction [
 
 { #category : 'visiting' }
 CigPharoVisitor >> visitMacroDefinition: aMacroDefinition [
-
 	aMacroDefinition isPrintable ifFalse: [ ^ self ].
 	(self file constantGenerator isPrintable: aMacroDefinition) ifFalse: [ ^ self ].
 	
-	constants add: aMacroDefinition name
+	constants add: aMacroDefinition
 ]
 
 { #category : 'visiting' }
@@ -271,6 +276,7 @@ CigPharoVisitor >> visitNamespace: aNamespace [
 
 { #category : 'visiting' }
 CigPharoVisitor >> visitStructure: aStructure [
+
 	logger trace: aStructure.
 
 	aStructure canBeExported ifFalse: [ 
@@ -334,5 +340,5 @@ CigPharoVisitor >> visitUnit: aUnit [
 { #category : 'visiting' }
 CigPharoVisitor >> visitVariadic: aVariadic [
 	
-	(CigPharoFunctionGenerator newFile: self file element: aVariadic) generateOn: self
+	(CigPharoVariadicGenerator newFile: self file element: aVariadic) generateOn: self
 ]

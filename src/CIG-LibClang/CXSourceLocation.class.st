@@ -27,16 +27,14 @@ CXSourceLocation >> clang_Location_isInSystemHeader [
 ]
 
 { #category : 'private' }
-CXSourceLocation >> clang_getFileLocationLine: line column: column offset: offset [
-	"Ignoring the retrieve of CXFile because is not prooven is needed, this may change in the future"
+CXSourceLocation >> clang_getFileLocation: file line: line column: column offset: offset [
 
 	self ffiCall: #(void clang_getFileLocation(
 		CXSourceLocation self,
-		"CXFile *  	file"NULL,
-		"unsigned *"void *line,
-		"unsigned *"void *column,
-		"unsigned *"void *offset 
-	) 	)
+			CXFile file,
+			uint *line,
+			uint *column,
+			uint *offset))
 ]
 
 { #category : 'private' }
@@ -53,18 +51,23 @@ CXSourceLocation >> clang_getSpellingLocationFile: file line: line column: colum
 
 { #category : 'accessing' }
 CXSourceLocation >> fileLocationTo: aBlock [
-	| line column offset |
+	| fileHolder lineHolder columnHolder offsetHolder |
 	
+	fileHolder := CXFile newValueHolder.
+	lineHolder := FFIInt32 newValueHolder.
+	columnHolder := FFIInt32 newValueHolder.
+	offsetHolder := FFIInt32 newValueHolder.
+	self 
+		clang_getFileLocation: fileHolder 
+		line: lineHolder
+		column: columnHolder 
+		offset: offsetHolder. 
 	
-	line := FFIInt32 newBuffer.
-	column := FFIInt32 newBuffer.
-	offset := FFIInt32 newBuffer.
-	self clang_getFileLocationLine: line column: column offset: offset. 
-	
-	aBlock 
-		value: (line unsignedLongAt: 1)
-		value: (column unsignedLongAt: 1)
-		value: (offset unsignedLongAt: 1)
+	aBlock
+		value: fileHolder value
+		value: lineHolder value
+		value: columnHolder value
+		value: offsetHolder value
 ]
 
 { #category : 'accessing' }

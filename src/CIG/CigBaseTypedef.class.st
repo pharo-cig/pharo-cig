@@ -61,12 +61,9 @@ CigBaseTypedef >> fromCursor: aCursor [
 	underlyingType := aCursor typedefDeclUnderlyingType.
 	underlyingTypeName := underlyingType spelling.
 	underlyingTypeKind := underlyingType kind.
-	definesFunction := (underlyingTypeName beginsWith: 'std::function') 
-		"or: [ 
-			((underlyingTypeKind = CXType_Pointer or: [ underlyingTypeKind = CXType_MemberPointer ]) 
-			and: [ underlyingType pointeeType resultType ~= CXType_Invalid ])"
-		or: [ 
-			underlyingTypeName matchesRegex: '.*\(.*\)' ].
+	definesFunction := 
+		(underlyingTypeName beginsWith: 'std::function') 
+		or: [ (underlyingTypeName matchesRegex: '^(?!struct |union ).*\(.*\)') ].
 	definesArray := underlyingTypeKind = CXType_ConstantArray 
 			or: [ underlyingTypeKind = CXType_IncompleteArray
 			or: [ underlyingTypeKind = CXType_VariableArray ] ].

@@ -122,6 +122,11 @@ CigCParameterTemplate >> name [
 		ifEmpty: [ self anonymousName ]
 ]
 
+{ #category : 'generating' }
+CigCParameterTemplate >> registerRequiredTypeOn: aVisitor [
+	"override to add extra values to the visitor"
+]
+
 { #category : 'accessing' }
 CigCParameterTemplate >> type [
 

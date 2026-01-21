@@ -42,6 +42,7 @@ Class {
 		'winLibraryName',
 		'packageName',
 		'nameGenerator',
+		'elementGenerator',
 		'withBaseline',
 		'variadics',
 		'withConstants',
@@ -286,6 +287,12 @@ CigLibraryGenerator >> diagnostics [
 	^ self newTranslatedUnit diagnosticsFrom: self
 ]
 
+{ #category : 'accessing' }
+CigLibraryGenerator >> elementGenerator [
+
+	^ elementGenerator ifNil: [ elementGenerator := CigElementGenerator new ]
+]
+
 { #category : 'accessing - scripting' }
 CigLibraryGenerator >> exclude: aString [
 
@@ -461,7 +468,7 @@ CigLibraryGenerator >> macLibraryName: aString [
 { #category : 'accessing' }
 CigLibraryGenerator >> nameGenerator [
 
-	^ nameGenerator
+	^ nameGenerator ifNil: [ nameGenerator := CigNameGenerator new ]
 ]
 
 { #category : 'accessing - configuration' }
@@ -644,6 +651,12 @@ CigLibraryGenerator >> withClasses [
 	withClasses := true
 ]
 
+{ #category : 'accessing - scripting' }
+CigLibraryGenerator >> withConstantGenerator: aBlock [
+
+	aBlock value: self constantGenerator
+]
+
 { #category : 'accessing - configuration' }
 CigLibraryGenerator >> withConstants [
 	"Indicate the generator you want to generate a SharedPool named `LibraryNameConstants` 
@@ -653,6 +666,18 @@ CigLibraryGenerator >> withConstants [
 	 DEFAULT: true"
 
 	withConstants := true
+]
+
+{ #category : 'accessing - scripting' }
+CigLibraryGenerator >> withElementGenerator: aBlock [
+
+	aBlock value: self elementGenerator
+]
+
+{ #category : 'accessing - scripting' }
+CigLibraryGenerator >> withNameGenerator: aBlock [
+
+	aBlock value: self nameGenerator
 ]
 
 { #category : 'accessing - configuration' }

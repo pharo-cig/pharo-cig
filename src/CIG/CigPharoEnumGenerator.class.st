@@ -2,7 +2,7 @@ Class {
 	#name : 'CigPharoEnumGenerator',
 	#superclass : 'CigPharoGenerator',
 	#instVars : [
-		'generatedClass'
+		'generatedClassName'
 	],
 	#category : 'CIG-Pharo-Generator',
 	#package : 'CIG',
@@ -11,7 +11,7 @@ Class {
 
 { #category : 'private' }
 CigPharoEnumGenerator >> addEnum [
-	| name |
+	| name generatedClass |
 	
 	name := self element phDeclaration.
 	logger trace: name.
@@ -19,12 +19,14 @@ CigPharoEnumGenerator >> addEnum [
 		tag: self namespaceName;
 		package: self packageName;
 		install.
+		
+	generatedClassName := generatedClass name
 ]
 
 { #category : 'private' }
 CigPharoEnumGenerator >> addEnumDecl [
 
-	generatedClass class 
+	self generatedClass class 
 		compile: self element phTemplate generateEnumDecl
 		classified: 'enum declaration'
 ]
@@ -32,7 +34,7 @@ CigPharoEnumGenerator >> addEnumDecl [
 { #category : 'generating' }
 CigPharoEnumGenerator >> doInitialize [
 
-	generatedClass
+	self generatedClass
 		initializeEnumeration;
 		rebuildEnumAccessors
 ]
@@ -49,4 +51,10 @@ CigPharoEnumGenerator >> generateOn: aVisitor [
 	
 	super generateOn: aVisitor.
 	aVisitor registerForInitialization: self
+]
+
+{ #category : 'private' }
+CigPharoEnumGenerator >> generatedClass [
+
+	^ self class environment classNamed: generatedClassName
 ]

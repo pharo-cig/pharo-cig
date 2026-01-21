@@ -48,6 +48,20 @@ CigCppTranslatedUnit >> elementAtPath: aPath [
 ]
 
 { #category : 'accessing' }
+CigCppTranslatedUnit >> elementAtPath: aPath excluding: aCollectionOfElements [
+
+	(super elementAtPath: aPath excluding: aCollectionOfElements) 
+		ifNotNil: [ :anElement | ^ anElement ].
+
+	self namespaces do: [ :each |
+		(self elementAtPath: aPath inNamespace: each)
+			ifNotNil: [ :anElement | ^ anElement ] ].
+		
+	^ nil
+	
+]
+
+{ #category : 'accessing' }
 CigCppTranslatedUnit >> elementAtPath: aPath inNamespace: aNamespace [
 	| elementName |
 	

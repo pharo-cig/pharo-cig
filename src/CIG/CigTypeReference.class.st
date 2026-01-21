@@ -74,8 +74,15 @@ CigTypeReference >> isUnknownReference [
 
 { #category : 'accessing' }
 CigTypeReference >> matchingElementInUnit [
+	| excluded |
 
-	(self parent scopeLookupPath: self namePath) ifNotNil: [ :anElement | ^ anElement ].
+	"first parent is the field. Parent of field is the caller -likely a struct-"
+	excluded :=self parent parent elements 
+		select: [ :each | 
+			each typeReference isNotNil 
+			and: [ each typeReference name = self parent typeReference name ] ].
+	(self parent scopeLookupPath: self namePath excluding: excluded) 
+		ifNotNil: [ :anElement | ^ anElement ].
 	"sometimes, it happens that this reference is splitted into a namespace reference and a 
 	 type reference, in that case the namespace referece should be contained in the parent."
 	self parent elements 

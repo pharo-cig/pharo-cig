@@ -122,12 +122,6 @@ CigFunction >> isOperator [
 ]
 
 { #category : 'testing' }
-CigFunction >> isReturnTypeVoid [
-
-	^ self returnTypeName = 'void'
-]
-
-{ #category : 'testing' }
 CigFunction >> isTemplateSpecialization [
 
 	^ elaboratedSpec 

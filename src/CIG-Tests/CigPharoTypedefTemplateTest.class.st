@@ -51,6 +51,41 @@ CigPharoTypedefTemplateTest >> testVisitTypedefWithStruct [
 ]
 
 { #category : 'tests' }
+CigPharoTypedefTemplateTest >> testVisitTypedefWithStructAnonymousLarge [
+	"For some reason, when an anonymous struct (declared directly with typedef) 
+	 is large (more than two fielda), clang will declare the structure as anonymous 
+	 (otherwise it will declare it with the same name... no idea why)"
+	| unit visitor typedefClass structClass |
+
+	unit := self newUnit: '
+typedef struct { 
+   const int8 *raw;
+   uint32 len;     
+   uint32 off;     
+   uint32 type;    
+   uint32 key;     
+   uint32 d1;      
+   uint32 d2;      
+   uint32 d3;      
+   uint32 d4;      
+   uint32 next_off;
+   uint32 err_off; 
+   int value; 
+} struct_t;
+'.
+
+	visitor := CigPharoVisitor newForTest.
+	visitor visitUnit: unit.
+
+	typedefClass := self class environment classNamed: #UnitGeneratedForTestTypedef.
+	"check struct is created"
+	structClass := self class environment classNamed: #UnitStruct1.
+	self assert: structClass isNotNil. 
+	"check typedef is defined"
+	self assert: (typedefClass classPool at: #struct_t) equals: structClass
+]
+
+{ #category : 'tests' }
 CigPharoTypedefTemplateTest >> testVisitTypedefWithStructPointer [
 	| element template unit |
 
@@ -65,6 +100,19 @@ typedef struct st *stp;
 	self 
 		assert: template generate
 		equals: '#''st *'''
+]
+
+{ #category : 'tests' }
+CigPharoTypedefTemplateTest >> testVisitTypedefWithTypedefToArray [
+	| unit element template |
+
+	unit := self newUnit: 'typedef unsigned char DES_cblock[8];'.
+	element := unit elements first.
+	template := element phTemplate.
+	
+	self 
+		assert: template generate
+		equals: 'uchar[8]'
 ]
 
 { #category : 'tests' }

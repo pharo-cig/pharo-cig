@@ -1,7 +1,6 @@
 Class {
 	#name : 'CXTranslationUnit',
 	#superclass : 'CXExternalObject',
-	#classTraits : 'TLibClang classTrait',
 	#category : 'CIG-LibClang',
 	#package : 'CIG-LibClang'
 }
@@ -140,6 +139,15 @@ CXTranslationUnit >> clang_getDiagnostic: index [
 ]
 
 { #category : 'private' }
+CXTranslationUnit >> clang_getFileContents: file size: size [
+
+	^ self ffiCall: #(const char* clang_getFileContents(
+ 	CXTranslationUnit self,
+    CXFile file,
+    size_t* size))
+]
+
+{ #category : 'private' }
 CXTranslationUnit >> clang_getNumDiagnostics [
 
 	^ self ffiCall: #(uint clang_getNumDiagnostics(self)) 	
@@ -186,13 +194,28 @@ CXTranslationUnit >> dispose [
 	self ffiCall: #(void clang_disposeTranslationUnit(self))
 ]
 
+{ #category : 'accessing - file' }
+CXTranslationUnit >> fileContents: aFile [ 
+	| buffer sizeHolder |
+	
+	sizeHolder := FFISizeT newValueHolder.
+	buffer := self clang_getFileContents: aFile size: sizeHolder.
+	buffer size = (sizeHolder value - 1) 
+		ifFalse: [ self error: 'Error reading file.' ].
+	
+	^ buffer
+]
+
 { #category : 'accessing - tokens' }
 CXTranslationUnit >> tokenSpelling: token [
 	| string |
 	
 	string := self clang_getTokenSpelling: token.
-	^ [ string cString ]
-		ensure: [ string dispose ]
+	string getHandle isNull ifTrue: [ ^ nil ].
+	
+	^ [ string cString ] 
+	ensure: [ 
+		string dispose ]
 ]
 
 { #category : 'accessing - tokens' }

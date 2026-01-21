@@ -56,6 +56,9 @@ CigType class >> extractAnonymousLocation: aString [
 		but it can also be an array (ending on [NUM])"
 	| segments position |
 	
+	"if this is not anonymous there is nothing to extract, just answer nil"
+	(CigType isAnonymous: aString) ifFalse: [ ^ nil ].
+
 	segments := (aString substrings: ' ()').
 	"this can be an anonymous array"
 	position := segments last last = $] 
@@ -269,13 +272,7 @@ CigType >> element [
 	"if there is a typeReference, tries to answer it"
 
 	^ element ifNil: [ 
-		element := self disambiguatePossibleReference: (self typeReferenceForParsedType
-			ifNotNil: [ :aTypeReference |
-				"it can be an element from the tree (class, etc.)"
-				aTypeReference matchingElementInUnit ]
-			ifNil: [ 
-				"it can be a typedef or an existing node without a type reference"
-				 self parent scopeLookup: self parseType nameWithSpecialization ]) ]
+		element := self resolveElement ]
 ]
 
 { #category : 'initialization' }
@@ -500,6 +497,21 @@ CigType >> requiresCast [
 	^ self hasElement 
 		and: [ self element isTypedef
 		and: [ self element definesFunction ] ]
+]
+
+{ #category : 'private' }
+CigType >> resolveElement [
+	| solvedElement |
+
+	solvedElement := self typeReferenceForParsedType
+		ifNotNil: [ :aTypeReference |
+			"it can be an element from the tree (class, etc.). "
+			aTypeReference matchingElementInUnit ]
+		ifNil: [ 
+			"it can be a typedef or an existing node without a type reference"
+			 self parent scopeLookup: self parseType nameWithSpecialization ].
+
+	^ self disambiguatePossibleReference: solvedElement
 ]
 
 { #category : 'accessing' }

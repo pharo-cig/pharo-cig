@@ -87,6 +87,17 @@ CigTypeDeclaration >> nameWithArity [
 ]
 
 { #category : 'accessing' }
+CigTypeDeclaration >> nameWithArrayDeclaration [
+
+	^ String streamContents: [ :stream |
+		stream << self name.
+		self templateName ifNotNil: [ 
+			stream << '<' << self templateName << '>' ].
+		self arraySizes do: [ :aSize | 
+			stream << '[' << aSize asString << ']' ] ]
+]
+
+{ #category : 'accessing' }
 CigTypeDeclaration >> nameWithSpecialization [
 	"we produce a special element if we are specializating a class"
 

@@ -20,6 +20,18 @@ CigTElementContainer >> addElement: anElement [
 ]
 
 { #category : 'accessing' }
+CigTElementContainer >> elementAtPath: aPath [
+
+	self shouldBeImplemented
+]
+
+{ #category : 'accessing' }
+CigTElementContainer >> elementAtPath: aPath excluding: aCollectionOfElements [
+
+	self shouldBeImplemented
+]
+
+{ #category : 'accessing' }
 CigTElementContainer >> elements [
 
 	^ elements ifNil: [ #() ]
@@ -91,7 +103,14 @@ CigTElementContainer >> scopeLookup: aString [
 CigTElementContainer >> scopeLookupPath: aPath [
 
 	^ (self elementAtPath: aPath)
-		ifNil:[ self parent scopeLookupPath: aPath ]
+		ifNil: [ self parent scopeLookupPath: aPath ]
+]
+
+{ #category : 'accessing' }
+CigTElementContainer >> scopeLookupPath: aPath excluding: aCollectionOfElements [
+
+	^ (self elementAtPath: aPath excluding: aCollectionOfElements)
+		ifNil: [ self parent scopeLookupPath: aPath excluding: aCollectionOfElements ]
 ]
 
 { #category : 'private - traversing' }

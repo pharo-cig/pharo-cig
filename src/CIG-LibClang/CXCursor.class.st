@@ -470,21 +470,42 @@ CXCursor >> source [
 	
 	location := self location.
 	fileName := location fileName.
-	fileName ifEmpty: [ ^ nil ].	
-	
-	range := self clang_getCursorExtent.	
+	fileName ifEmpty: [ ^ nil ].
+
+	range := self clang_getCursorExtent.
+
 	posStart := range start offset.
 	posEnd := range end offset.
+
 	size := posEnd - posStart.
 	size < 1 ifTrue: [
 		logger debug: ('I can''t get the source of "{1}" in {2}' format: { self spelling. fileName }).
 		^ '' ].
-	
-	fileName asFileReference readStreamDo: [ :stream |
-		stream position: posStart.
-		source := stream next: size ].
 
-	^ source trimmed
+	source := fileName asFileReference exists
+		ifTrue: [
+          fileName asFileReference readStreamDo: [ :stream |
+				stream position: posStart.
+				stream next: size ] ]
+      ifFalse: [ 
+			self sourceFromRange: range ].
+
+	^ source trimBoth
+]
+
+{ #category : 'accessing' }
+CXCursor >> sourceFromRange: aRange [
+	| file start end |
+	
+	aRange start fileLocationTo: [ :aFile :aRow :aCol :anOffset | 
+		file := aFile. 
+		start := anOffset ].
+	aRange end fileLocationTo: [ :aFile :aRow :aCol :anOffset | 
+		end := anOffset ].
+	
+	^ (self translationUnit fileContents: file) 
+		copyFrom: start 
+		to: end
 ]
 
 { #category : 'accessing' }

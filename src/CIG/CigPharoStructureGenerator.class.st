@@ -2,7 +2,7 @@ Class {
 	#name : 'CigPharoStructureGenerator',
 	#superclass : 'CigPharoGenerator',
 	#instVars : [
-		'generatedClass'
+		'generatedClassName'
 	],
 	#category : 'CIG-Pharo-Generator',
 	#package : 'CIG',
@@ -17,7 +17,7 @@ CigPharoStructureGenerator class >> structType [
 
 { #category : 'private' }
 CigPharoStructureGenerator >> addStruct [
-	| name |
+	| name generatedClass |
 	
 	name := self structName.
 	logger trace: name.
@@ -25,13 +25,15 @@ CigPharoStructureGenerator >> addStruct [
 	generatedClass := (self baseClass << name)
 		tag: self namespaceName;
 		package: self packageName;
-		install
+		install.
+		
+	generatedClassName := generatedClass name
 ]
 
 { #category : 'private' }
 CigPharoStructureGenerator >> addStructFieldsDesc [
 	
-	generatedClass class 
+	self generatedClass class 
 		compile: self element phTemplate generateFieldsDesc
 		classified: 'field definition'
 ]
@@ -45,7 +47,7 @@ CigPharoStructureGenerator >> baseClass [
 { #category : 'generating' }
 CigPharoStructureGenerator >> doInitialize [
 
-	generatedClass rebuildFieldAccessors
+	self generatedClass rebuildFieldAccessors
 ]
 
 { #category : 'generating' }
@@ -66,6 +68,12 @@ CigPharoStructureGenerator >> generateOn: aVisitor [
 			aVisitor
 				registerDeclaration: each cTemplate generateFFIType
 				as: (self nameForArrayType: each resolveType) ]
+]
+
+{ #category : 'private' }
+CigPharoStructureGenerator >> generatedClass [
+
+	^ self class environment classNamed: generatedClassName
 ]
 
 { #category : 'generating' }

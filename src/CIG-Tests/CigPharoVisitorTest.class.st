@@ -414,9 +414,89 @@ CigPharoVisitorTest >> testVisitFunctionAddsFunctionToLibrary [
 
 { #category : 'tests - function' }
 CigPharoVisitorTest >> testVisitFunctionWithArrayParameterAddsArrayType [
+	"an argument with [NUM] should add a typedef"
+	| unit element template visitor class |
 
-	self skip. "I do not remember why I added it (to see later) :P"
-	self fail
+	unit := self newUnit: '
+		int aFunction(int arg[42]);'.
+
+	element := unit elements first.
+
+	visitor := CigPharoVisitor newForTest.
+	visitor addBaseClasses: self translatedUnitTvision.
+	
+	class := self class environment classNamed: 'LibGeneratedForTest'.
+	
+	visitor visitFunction: element.
+	
+	self assert: (class canUnderstand: #aFunction:).
+	self 
+		assert: (class >> #aFunction:) sourceCode 
+		equals: 'aFunction: arg
+
+	^ self ffiCall: #(int aFunction(int_42 arg))'.
+	
+	self assert: (visitor types includesKey: 'int_42').
+	self assert: (visitor types at: 'int_42') equals: 'int[42]' 
+]
+
+{ #category : 'tests - function' }
+CigPharoVisitorTest >> testVisitFunctionWithArrayParameterAddsStructArrayType [
+	"an argument with [NUM] should add a typedef"
+	| unit element template visitor class |
+
+	unit := self newUnit: '
+		struct tt { int a };
+		int aFunction(struct tt arg[42]);'.
+
+	element := unit elements second.
+
+	visitor := CigPharoVisitor newForTest.
+	visitor addBaseClasses: self translatedUnitTvision.
+	
+	visitor visitFunction: element.
+
+	class := self class environment classNamed: 'LibGeneratedForTest'.
+	
+	visitor visitFunction: element.
+
+	self assert: (class canUnderstand: #aFunction:).
+	self 
+		assert: (class >> #aFunction:) sourceCode 
+		equals: 'aFunction: arg
+
+	^ self ffiCall: #(int aFunction(tt_42 arg))'.
+	
+	self assert: (visitor types includesKey: 'tt_42').
+	self assert: (visitor types at: 'tt_42') equals: 'struct tt[42]' 	
+]
+
+{ #category : 'tests - function' }
+CigPharoVisitorTest >> testVisitFunctionWithConstArrayParameterAddsArrayType [
+	"an argument with [NUM] should add a typedef"
+	| unit element template visitor class |
+
+	unit := self newUnit: '
+		int aFunction(const int arg[42]);'.
+
+	element := unit elements first.
+
+	visitor := CigPharoVisitor newForTest.
+	visitor addBaseClasses: self translatedUnitTvision.
+	
+	class := self class environment classNamed: 'LibGeneratedForTest'.
+	
+	visitor visitFunction: element.
+	
+	self assert: (class canUnderstand: #aFunction:).
+	self 
+		assert: (class >> #aFunction:) sourceCode 
+		equals: 'aFunction: arg
+
+	^ self ffiCall: #(int aFunction(const int_42 arg))'.
+	
+	self assert: (visitor types includesKey: 'int_42').
+	self assert: (visitor types at: 'int_42') equals: 'int[42]' 
 ]
 
 { #category : 'tests - function' }
@@ -586,6 +666,81 @@ CigPharoVisitorTest >> testVisitNamespaceAddsNamespaceWithPrefix [
 	
 	class := self class environment classNamed: 'XxNoiseNamespace'.
 	self assert: class notNil
+]
+
+{ #category : 'tests' }
+CigPharoVisitorTest >> testVisitStructWithUnionAnonymousAndAnonymousWillRegisterType [
+	| unit visitor |
+
+	unit := self newUnit: '
+typedef struct struct_s {
+   int value_type;
+   int padding;
+   union {
+      int v_oid;
+      int v_int64;
+      int v_int32;
+      int v_int8;
+      double v_double;
+      bool v_bool;
+      int v_datetime;
+      struct  {
+         int timestamp;
+         int increment;
+      } v_timestamp;
+      struct {
+         char *str;
+         int len;
+      } v_utf8;
+      struct {
+         int *data;
+         int data_len;
+      } v_doc;
+      struct {
+         int *data;
+         int data_len;
+         int subtype;
+      } v_binary;
+      struct {
+         char *regex;
+         char *options;
+      } v_regex;
+      struct {
+         char *collection;
+         int collection_len;
+         int oid;
+      } v_dbpointer;
+      struct {
+         char *code;
+         int code_len;
+      } v_code;
+      struct {
+         char *code;
+         int *scope_data;
+         int code_len;
+         int scope_len;
+      } v_codewscope;
+      struct {
+         char *symbol;
+         int len;
+      } v_symbol;
+      int v_decimal128;
+   } value;
+} struct_t
+'.
+
+	visitor := CigPharoVisitor newForTest.	
+	visitor addBaseClasses: unit.
+	visitor visitStructure: unit elements first.
+	visitor endUnit: unit.
+	self 
+		assertCollection: ((Smalltalk classNamed: #UnitStructure) allSubclasses collect: #name)
+		hasSameElements: #(UnitStructSUnion1Struct1 UnitStructSUnion1Struct2 UnitStructSUnion1Struct3 UnitStructSUnion1Struct4 UnitStructSUnion1Struct5 UnitStructSUnion1Struct6 UnitStructSUnion1Struct7 UnitStructSUnion1Struct8 UnitStructSUnion1Struct9 UnitStructS).
+				
+	self 
+		assertCollection: ((Smalltalk classNamed: #UnitUnion) allSubclasses collect: #name)
+		hasSameElements: #(UnitStructSUnion1)
+
 ]
 
 { #category : 'tests - struct' }

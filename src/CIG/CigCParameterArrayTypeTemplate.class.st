@@ -74,3 +74,16 @@ CigCParameterArrayTypeTemplate >> generateFFIType [
 	
 	^ self generateCType
 ]
+
+{ #category : 'generating' }
+CigCParameterArrayTypeTemplate >> registerRequiredTypeOn: aVisitor [
+ 
+ 	"do not register if it is an empty array (it will be a pointer)"
+ 	(type parseType arraySizes isEmpty 
+ 		or: [ type parseType arraySizes first = 0 ])
+ 		ifTrue: [ ^ self ].
+
+	aVisitor 
+		registerDeclaration: self element cTemplate generateFFITypeForField
+		as: self type parseType nameWithArrayDeclaration
+]

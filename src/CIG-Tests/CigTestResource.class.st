@@ -159,7 +159,12 @@ CigTestResource class >> raylibSpec [
 { #category : 'utilities' }
 CigTestResource class >> readResource: aString [
 
-	^ FLMaterializer materializeFromFileNamed: (self resourceFileName: aString)
+	^ (FLMaterializer materializeFromFileNamed: (self resourceFileName: aString))
+		"resources were generated before the introduction of name generators, which means they 
+		 are now incomplete. While I ack I need to migrate the tests to not use resources anymore, 
+		 hacking this now will allow the units to be complete until then..." 
+		nameGenerator: CigNameGenerator new;
+		yourself
 ]
 
 { #category : 'utilities' }

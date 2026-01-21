@@ -159,6 +159,20 @@ CigTranslatedUnit >> elementAtPath: aPath [
 ]
 
 { #category : 'accessing' }
+CigTranslatedUnit >> elementAtPath: aPath excluding: aCollectionOfElements [
+	| current |
+
+	current := self.
+	aPath do: [ :each |
+		current ifNil: [ ^ nil ].
+		current := current findElementMatching: [ :eachElement | 
+			(aCollectionOfElements includes: eachElement) not 
+				and: [ eachElement isEqualToPath: each ] ] ].
+	
+	^ current
+]
+
+{ #category : 'accessing' }
 CigTranslatedUnit >> elements [
 
 	^ elements ifNil: [ #() ]
@@ -247,17 +261,19 @@ CigTranslatedUnit >> generateFrom: aHeader [
 	logger trace: excluding.
 	logger trace: includingPaths.
 	logger trace: excludingPaths.
-		
+	
 	self preprocess: aHeader.
 	aHeader imports valuesDo: [ :each |
 		self generateTarget: each from: aHeader ].
 	variadics keysAndValuesDo: [ :aSelector :aDeclaration |
-		self addElement: (CigVariadic newDeclaration: aDeclaration selector: aSelector) ]
+		self addElement: (CigVariadic newDeclaration: aDeclaration selector: aSelector) ].
+		
+	aHeader elementGenerator postProcess: self
 ]
 
 { #category : 'generating' }
 CigTranslatedUnit >> generateTarget: aTarget from: aHeader [
-	| unit cursor tuple fileName index unit |
+	| unit cursor tuple fileName index |
 
 	logger info: 'Processing ', aTarget name, '...'.
 	
@@ -265,7 +281,6 @@ CigTranslatedUnit >> generateTarget: aTarget from: aHeader [
 	fileName := tuple first. 
 	index := tuple second.
 	unit := tuple third.
-
 	cursor := unit cursor.
 	cursor visitChildren: [ :current :parent :data |
 		[ 
@@ -299,6 +314,16 @@ CigTranslatedUnit >> generateTarget: aTarget from: aHeader [
 CigTranslatedUnit >> hasElements [
 
 	^ elements notNil
+]
+
+{ #category : 'accessing' }
+CigTranslatedUnit >> indexOfElementOfSameKind: anElement [
+	"selects elements of same type of anElement and answer the index of 
+	 in in such collection (this is useful to name anonymous structs/unions/enums)" 
+
+	^ (self elements
+		select: [ :each | each kind = anElement kind ]) 
+		indexOf: anElement
 ]
 
 { #category : 'initialization' }
@@ -499,7 +524,14 @@ CigTranslatedUnit >> nameFor: anElement [
 { #category : 'accessing' }
 CigTranslatedUnit >> nameGenerator [
 
-	^ nameGenerator ifNil: [ nameGenerator := CigNameGenerator new ]
+	^ nameGenerator
+]
+
+{ #category : 'private' }
+CigTranslatedUnit >> nameGenerator: aNameGenerator [
+	"this is used mainly for testing"
+
+	nameGenerator := aNameGenerator
 ]
 
 { #category : 'accessing' }
@@ -603,6 +635,12 @@ CigTranslatedUnit >> removeAllUnknowns [
 		eachElement elements removeAll: (eachElement elements select: [ :each | each isUnknown ]) ]
 ]
 
+{ #category : 'accessing' }
+CigTranslatedUnit >> removeElement: anElement [
+
+	self elements remove: anElement ifAbsent: []
+]
+
 { #category : 'private' }
 CigTranslatedUnit >> reset [
 
@@ -645,6 +683,12 @@ CigTranslatedUnit >> root [
 
 { #category : 'accessing' }
 CigTranslatedUnit >> scopeLookupPath: aPath [
+
+	^ self elementAtPath: aPath
+]
+
+{ #category : 'accessing' }
+CigTranslatedUnit >> scopeLookupPath: aPath excluding: aCollectionOfElements [
 
 	^ self elementAtPath: aPath
 ]

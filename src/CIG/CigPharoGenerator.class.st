@@ -49,7 +49,7 @@ CigPharoGenerator >> baseEnumClassName [
 
 	^ String streamContents: [ :stream |
 		stream 
-			<< self prefix capitalized
+			<< (self file nameGenerator prefixToUse: self prefix)
 			<< 'Enumeration' ]
 ]
 
@@ -64,7 +64,7 @@ CigPharoGenerator >> baseObjectClassName [
 
 	^ String streamContents: [ :stream |
 		stream 
-			<< self prefix capitalized
+			<< (self file nameGenerator prefixToUse: self prefix)
 			<< 'BaseObject' ]
 ]
 
@@ -79,7 +79,7 @@ CigPharoGenerator >> baseStructureClassName [
 
 	^ String streamContents: [ :stream |
 		stream 
-			<< self prefix capitalized
+			<< (self file nameGenerator prefixToUse: self prefix)
 			<< 'Structure' ]
 ]
 
@@ -94,7 +94,7 @@ CigPharoGenerator >> baseUnionClassName [
 
 	^ String streamContents: [ :stream |
 		stream 
-			<< self prefix capitalized
+			<< (self file nameGenerator prefixToUse: self prefix)
 			<< 'Union' ]
 ]
 
@@ -154,13 +154,13 @@ CigPharoGenerator >> libraryConstantsClass [
 
 { #category : 'private' }
 CigPharoGenerator >> libraryConstantsName [
-	| prefix name |
+	| name |
 
-	prefix := self prefix.
 	name := self file libraryName capitalized.
 	^ String streamContents: [ :stream |
-		(name asLowercase beginsWith: prefix asLowercase)
-			ifFalse: [ stream << prefix capitalized ].
+		(name asLowercase beginsWith: self prefix asLowercase)
+			ifTrue: [ name := name allButFirst: self prefix size ].
+		stream << (self file nameGenerator prefixToUse: self prefix).
 		stream << name.
 		stream << 'Constants' ]
 ]
@@ -191,13 +191,13 @@ CigPharoGenerator >> libraryTypedefClass [
 
 { #category : 'private' }
 CigPharoGenerator >> libraryTypedefName [
-	| prefix name |
+	| name |
 
-	prefix := self prefix.
 	name := self file libraryName capitalized.
 	^ String streamContents: [ :stream |
-		(name asLowercase beginsWith: prefix asLowercase)
-			ifFalse: [ stream << prefix capitalized ].
+		(name asLowercase beginsWith: self prefix asLowercase)
+			ifTrue: [ name := name allButFirst: self prefix size ].
+		stream << (self file nameGenerator prefixToUse: self prefix).
 		stream << name.
 		stream << 'Typedef' ]
 ]
