@@ -27,7 +27,7 @@ CigCTypedefTemplateTest >> testGenerateArrayType [
 	
 	self 
 		assert: template generate
-		equals: 'typedef char* tv_TScrollChars;'
+		equals: 'typedef char[5] tv_TScrollChars;'
 ]
 
 { #category : 'tests' }

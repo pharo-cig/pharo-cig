@@ -510,16 +510,14 @@ CigCVisitorTest >> testVisitStructureWithAnonymousUnionGeneratesCorrectCStruct [
 
 { #category : 'tests - typedef' }
 CigCVisitorTest >> testVisitTypedefWithArrayDeclaresCorrectly [
-	| element visitor |
 
+	| element visitor |
 	element := self translatedUnitTvision elementAtPath: { 'TScrollChars' }.
-	
+
 	visitor := CigCHeaderDeclareVisitor newForTest.
 	visitor visitTypedef: element.
-	
-	self 
-		assert: visitor hStream contents trimmed 
-		equals: 'typedef char* tv_TScrollChars;'
+
+	self assert: visitor hStream contents trimBoth equals: 'typedef char* tv_TScrollChars;'
 ]
 
 { #category : 'tests - typedef' }

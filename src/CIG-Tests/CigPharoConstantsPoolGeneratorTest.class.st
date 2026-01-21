@@ -86,7 +86,8 @@ CigPharoConstantsPoolGeneratorTest >> testEmptyDefineWillGenerateTrue [
 	file := CigCLibraryGenerator new 
 		packageName: 'UnitToTest';
 		libraryName: 'unittotest';
-		withConstantGenerator: [ :gen | gen doNotGroup ];
+		withConstantGenerator: [ :gen | 
+			gen includeEmptyDefinitions; doNotGroup ];
 		importUnit: '
 #define MACRO
 ';

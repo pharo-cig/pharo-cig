@@ -541,7 +541,9 @@ CigPharoVisitorTest >> testVisitMacroDefinition [
 	visitor := CigPharoVisitor newForTestAsC.	
 	visitor visitMacroDefinition: element.
 	
-	self assert: visitor constants asArray equals: #('MACRO')
+	self 
+		assert: (visitor constants collect: #name as: Array) 
+		equals: #('MACRO')
 ]
 
 { #category : 'tests - macro' }
