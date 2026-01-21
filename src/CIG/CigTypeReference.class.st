@@ -80,7 +80,8 @@ CigTypeReference >> matchingElementInUnit [
 	excluded :=self parent parent elements 
 		select: [ :each | 
 			each typeReference isNotNil 
-			and: [ each typeReference name = self parent typeReference name ] ].
+			and: [ self parent typeReference isNotNil 
+			and: [ each typeReference name = self parent typeReference name ] ] ].
 	(self parent scopeLookupPath: self namePath excluding: excluded) 
 		ifNotNil: [ :anElement | ^ anElement ].
 	"sometimes, it happens that this reference is splitted into a namespace reference and a 

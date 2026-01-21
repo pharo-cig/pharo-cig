@@ -135,22 +135,15 @@ CigNameGenerator >> visit: anElement [
 { #category : 'visiting' }
 CigNameGenerator >> visitConstructor: anElement [
 	| params |
-
-	^ (String streamContents: [ :stream | 
-			stream 
-				<< anElement disambiguatedName uncapitalized 
-				<< '_new'.
-			(params := anElement parameters) size = 1
-				ifTrue: [ 
-					stream << ': ' << params first name  ]
-				ifFalse: [  
-					anElement parameters do: [ :each | 
-						stream 
-							<< each name  
-							<< ': ' 
-							<< each name 
-							<< ' ' ] ] ])
-		trimmed
+	
+	^ (String streamContents: [ :stream |
+		stream << anElement disambiguatedName uncapitalized << '_new'.
+		(params := anElement parameters) size = 1
+			ifTrue: [ stream << ': ' << params first name ]
+			ifFalse: [ 
+				anElement parameters 
+					do: [ :each | stream << each name << ': ' << each name << ' ' ] ] ]) 
+		trimBoth
 ]
 
 { #category : 'visiting' }
@@ -204,10 +197,10 @@ CigNameGenerator >> visitFunctionProtocol: anElement [
 { #category : 'visiting' }
 CigNameGenerator >> visitMethod: anElement [
 
-	^ (String streamContents: [ :stream | 
-			stream  << anElement disambiguatedName uncapitalized.
-			anElement buildParametersOn: stream ])
-		trimmed
+	^ (String streamContents: [ :stream |
+			stream << anElement disambiguatedName uncapitalized.
+			anElement buildParametersOn: stream ]) 
+		trimBoth
 ]
 
 { #category : 'visiting' }

@@ -2,7 +2,9 @@ Class {
 	#name : 'CigConstantGeneratorGroupStrategy',
 	#superclass : 'Object',
 	#instVars : [
-		'constantGenerator'
+		'constantGenerator',
+		'preferHexadecimal',
+		'ignoreEmptyDefinitions'
 	],
 	#category : 'CIG-Constant',
 	#package : 'CIG',

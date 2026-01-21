@@ -43,20 +43,15 @@ CigCTypedefTemplate >> generateCType [
 { #category : 'generating' }
 CigCTypedefTemplate >> generateFFIType [
 	| ffiType typeName |
-
-	typeName := self typeName.
-
-	"it may point to an element defined here"
-	(self lookupType: typeName) 
-		ifNotNil: [ :anElement | ^ anElement phDeclaration ].
-
-	"or it may point to a *pointer* to an element defined here"	
+	
+	typeName := self typeName. "it may point to an element defined here"
+	(self lookupType: typeName) ifNotNil: [ :anElement | ^ anElement phDeclaration ]. 
+	"or it may point to a *pointer* to an element defined here"
 	(typeName includesAnyOf: '*&') ifTrue: [
-		| stripName | 
-		stripName := (typeName reject: [ :each | '*&' includes: each ]) trimmed.
-		(self lookupType: stripName) ifNotNil: [ :anElement | 
-			^ self encloseFFIType: (typeName copyReplaceAll: stripName with: anElement cDeclaration) ] ].
-		
+			| stripName |
+			stripName := (typeName reject: [ :each | '*&' includes: each ]) trimBoth.
+			(self lookupType: stripName) ifNotNil: [ :anElement |
+				^ self encloseFFIType: (typeName copyReplaceAll: stripName with: anElement cDeclaration) ] ]. 
 	"otherwise resolve it as a C type"
 	ffiType := CigType resolveFFIType: typeName.
 	^ self encloseFFIType: ffiType

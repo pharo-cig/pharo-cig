@@ -95,8 +95,8 @@ CigMethod >> isVirtual [
 { #category : 'accessing' }
 CigMethod >> operator [
 	"if method is an overloaded operator, this accessor will answer the operator it is defining"
-	
-	^ ((self name allButFirst: 8) copyUpTo: $() trimmed
+
+	^ ((self name allButFirst: 8) copyUpTo: $() trimBoth
 ]
 
 { #category : 'converting' }

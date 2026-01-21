@@ -16,15 +16,15 @@ CigPharoConstructorGenerator >> classForElement [
 
 { #category : 'as yet unclassified' }
 CigPharoConstructorGenerator >> factoryMethodName [
-	
-	^ (String streamContents: [ :stream | 
-			stream  <<  'new'.
-			self element parameters ifNotEmpty: [ :params |
-				params first in: [ :each | 
-					stream << each name capitalized << ': ' << each name << ' ' ].
-				params allButFirst do: [ :each | 
-					stream << each name << ': ' << each name << ' ' ] ] ])
-		trimmed
+
+	^ (String streamContents: [ :stream |
+		stream << 'new'.
+		self element parameters ifNotEmpty: [ :params |
+			params first 
+				in: [ :each | stream << each name capitalized << ': ' << each name << ' ' ].
+			params allButFirst 
+				do: [ :each | stream << each name << ': ' << each name << ' ' ] ] ]) 
+	trimBoth
 ]
 
 { #category : 'as yet unclassified' }

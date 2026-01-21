@@ -46,20 +46,20 @@ CigMakefile >> find: aFileName in: aPathCollection [
 { #category : 'visiting' }
 CigMakefile >> visitUnix: aPlatform [
 	| makefile process |
-	
+
 	makefile := self 
-		find: 'make'
+		find: 'make' 
 		in: ((aPlatform environment at: 'PATH') substrings: ':').
-	
-	process := GIOPipedProcess 
+
+	process := GIOPipedProcess
 		spawn: makefile
-		arguments: #() 
-		workingDirectory: file cFileReference parent fullName
-		flags: GSpawnFlags G_SPAWN_DEFAULT.
-		
-	self logDebug: [ process outChannel readAllLines asStringWithCr].
+      arguments: #(  )
+      workingDirectory: file cFileReference parent fullName
+      flags: GSpawnFlags G_SPAWN_DEFAULT.
+
+	self logDebug: [ process outChannel readAllLines asStringWithCr ].
 	(process errChannel readAllLines 
-		reject: [ :each | each trimmed isEmpty  ])
+		reject: [ :each | each trimBoth isEmpty ]) 
 		ifNotEmpty: [ :errorLines |
 			self error: errorLines asStringWithCr ]
 ]
