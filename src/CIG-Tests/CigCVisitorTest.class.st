@@ -517,7 +517,7 @@ CigCVisitorTest >> testVisitTypedefWithArrayDeclaresCorrectly [
 	visitor := CigCHeaderDeclareVisitor newForTest.
 	visitor visitTypedef: element.
 
-	self assert: visitor hStream contents trimBoth equals: 'typedef char* tv_TScrollChars;'
+	self assert: visitor hStream contents trimBoth equals: 'typedef char[5] tv_TScrollChars;'
 ]
 
 { #category : 'tests - typedef' }
