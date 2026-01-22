@@ -11,6 +11,10 @@ Metacello new
 
 ## Requirements
 
+### Older Pharo versions (<14)
+If you are using older Pharo versions (previous to version 14), you will need to [update UnifiedFFI](https://github.com/pharo-cig/UnifiedFFI) first.  
+
+### Finding your libclang library
 CIG needs to be able to find the clang library.
 If it cannot find it automatically, set the location 
 in LibClang>>unix64LibraryName, e.g.
