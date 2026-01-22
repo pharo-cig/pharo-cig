@@ -61,8 +61,8 @@ CigElementGenerator >> postProcess: aUnit [
  
 	transforms keysAndValuesDo: [ :aName :aBlock | 
 		aUnit elements 
-			detect: [ :each | each name = aName ] 
-			ifFound: [ :anElement | aBlock value: anElement ] ]
+			select: [ :each | each name = aName ] 
+			thenDo: [ :anElement | aBlock value: anElement ] ]
 ]
 
 { #category : 'accessing' }

@@ -110,6 +110,12 @@ CigField >> phTemplate [
 ]
 
 { #category : 'accessing' }
+CigField >> replaceTypeWith: aName [
+
+	typeName := aName
+]
+
+{ #category : 'accessing' }
 CigField >> resolveType [
 	
 	^ CigType new 
