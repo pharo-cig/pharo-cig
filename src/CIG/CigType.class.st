@@ -38,14 +38,15 @@ CigType class >> createTypeMap [
 
 	^ Dictionary newFromPairs: {
 	'unsigned'. 			#uint.
-	'unsigned int'. 	#uint.
+	'unsigned int'. 		#uint.
 	'unsigned long'. 	#ulong.
 	'unsigned short'. 	#ushort.
 	'unsigned char'. 	#uchar.
-	'signed char'. 	   #char.
-	'signed'.	  	      #int.
-	'signed int'.     #int.
-	'long double'.    #float128.
+	'signed char'. 	   	#char.
+	'signed'.	  	    #int.
+	'signed int'.     	#int.
+	'long double'.    	#float128.
+	'_Bool'.			 	#bool.
 	}
 ]
 
