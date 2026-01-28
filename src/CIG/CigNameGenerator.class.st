@@ -1,3 +1,7 @@
+"
+A name generator to coordinate name generation of different elements of a library.
+
+"
 Class {
 	#name : 'CigNameGenerator',
 	#superclass : 'CigVisitor',
