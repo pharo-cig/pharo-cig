@@ -7,6 +7,34 @@ Class {
 }
 
 { #category : 'tests' }
+CigFunctionTest >> testFunctionWitCommentWilllGenerateComment [
+	| unit element |
+	
+	unit := CigCLibraryGenerator new 
+		packageName: 'Unit';
+		prefix: 'Unit';
+		importUnit: '
+/**
+ * This is a comment
+ */
+void someFunction();
+';
+		translateUnit.	
+
+	self denyEmpty: unit elements.
+	
+	element := unit findElementMatching: [ :each | each name = 'someFunction()' ].
+	
+	self deny: element isNil.
+	self assert: element phTemplate generate equals: 'someFunction
+	"/**
+	 * This is a comment
+	 */"
+
+	self ffiCall: #(void someFunction())'
+]
+
+{ #category : 'tests' }
 CigFunctionTest >> testFunctionWithBooleanAsReturnWillBeParsedAsBooleanAndNotInt [
 	"this error emerged while parsing mongoc"
 	| unit element |

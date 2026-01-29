@@ -79,6 +79,12 @@ CXCursor >> basicKind [
 	^ self ffiCall: #(int clang_getCursorKind(CXCursor self))
 ]
 
+{ #category : 'as yet unclassified' }
+CXCursor >> canonical [
+
+	^ self ffiCall: #(CXCursor clang_getCanonicalCursor(CXCursor self))
+]
+
 { #category : 'private' }
 CXCursor >> clang_Cursor_getRawCommentText [
 

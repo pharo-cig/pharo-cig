@@ -91,11 +91,26 @@ CigTFunction >> disambiguateName: aString arguments: aCollection [
 ]
 
 { #category : 'initialization' }
+CigTFunction >> extractCommentFrom: aCursor [
+	"search a comment in the diferent possible contexts"
+
+	{
+		[ aCursor ].
+		[ aCursor canonical ].
+		[ aCursor lexicalParent ].
+	} do: [ :each | 
+		each value rawComment 
+			ifNotEmpty: [ :aString | ^ aString ] ] .
+	
+	^ ''
+]
+
+{ #category : 'initialization' }
 CigTFunction >> fillFunctionWith: aCursor [
 
 	returnTypeName := aCursor type resultType spelling.
 	spelling := aCursor spelling.
-	comment := aCursor rawComment.
+	comment := 	self extractCommentFrom: aCursor.
 	isVariadic := aCursor isVariadic.
 	parameters := aCursor arguments collect: [ :each | 
 		(CigParameter fromCursor: each)

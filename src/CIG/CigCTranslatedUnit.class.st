@@ -12,7 +12,7 @@ Class {
 { #category : 'private' }
 CigCTranslatedUnit >> defaultClangArguments [
 	
-	^ { '-E' }
+	^ { '-E'. '-fparse-all-comments' }
 ]
 
 { #category : 'testing' }
