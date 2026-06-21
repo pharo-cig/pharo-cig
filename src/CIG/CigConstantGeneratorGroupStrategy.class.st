@@ -69,8 +69,15 @@ CigConstantGeneratorGroupStrategy >> literalStringToInternal: aString [
 CigConstantGeneratorGroupStrategy >> literalValueOf: aString [
 	| literal |
 
-	"remove long cast"
-	literal := aString.
+	literal := String streamContents: [ :out | | in next |
+		in := aString readStream.
+		[ in atEnd  ] whileFalse: [ 
+			next := in next.
+			(next = $\ and: [ (in peek = Character cr) or: (in peek = Character lf) ]) ifTrue: [ next := in next ].
+		out nextPut: next ]].
+
+	literal := literal trimBoth.
+	
 	
 	[ #($L $U) includes: literal last asUppercase ]
 	whileTrue: [ literal := literal allButLast ].
