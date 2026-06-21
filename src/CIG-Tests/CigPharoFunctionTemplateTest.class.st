@@ -37,17 +37,15 @@ CigPharoFunctionTemplateTest >> testGenerateFunctionForCLibraryDoesNotGeneratesP
 { #category : 'tests' }
 CigPharoFunctionTemplateTest >> testGenerateFunctionWithArrayZeroLength [
 	"an argument with [] (zero length) should map to *"
-	| unit element template |
 
+	| unit element template |
 	unit := self newUnit: '
 		int aFunction(int arg[]);'.
 
 	element := unit elements first.
 	template := element elements first cTemplate.
-	
-	self 
-		assert: template generateForFFI
-		equals: 'int_0 arg'
+
+	self assert: template generateForFFI equals: 'int* arg'
 ]
 
 { #category : 'tests' }
