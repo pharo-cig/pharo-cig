@@ -50,7 +50,9 @@ CigCParameterArrayTypeTemplate >> generateCType [
 	typeName := parsed name.
 
 	^ String streamContents: [ :stream |
+		"there may still be a typedef type (format namespace::type), we just "
 		| path |
+		
 		self type isConst ifTrue: [ stream << 'const ' ].
 
 		path := CigType toTypePath: typeName.
@@ -60,11 +62,13 @@ CigCParameterArrayTypeTemplate >> generateCType [
 
 		1 + startArity to: parsed arity do: [ :each | stream << '_pointer' ].
 		parsed arraySizes ifNotEmpty: [
-			  (parsed arraySizes allSatisfy: [ :each | each = 0 ])
-				  ifTrue: [ stream << '*' ]
-				  ifFalse: [
-						  stream << '_'.
-						  parsed arraySizes do: [ :each | stream print: each ] separatedBy: [ stream << '_' ] ] ] ]
+			(parsed arraySizes allSatisfy: [ :each | each = 0 ])
+				ifTrue: [ 
+					stream << '*' ]
+				ifFalse: [
+					stream << '_'.
+					parsed arraySizes 
+						do: [ :each | stream print: each ] separatedBy: [ stream << '_' ] ] ] ]
 ]
 
 { #category : 'generating' }
