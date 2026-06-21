@@ -68,7 +68,8 @@ CigCParameterArrayTypeTemplate >> generateCType [
 				ifFalse: [
 					stream << '_'.
 					parsed arraySizes 
-						do: [ :each | stream print: each ] separatedBy: [ stream << '_' ] ] ] ]
+						do: [ :each | stream print: each ] 
+						separatedBy: [ stream << '_' ] ] ] ]
 ]
 
 { #category : 'generating' }
