@@ -193,10 +193,10 @@ CigTestResource class >> resourceFileName: aLibName [
 { #category : 'utilities' }
 CigTestResource class >> resourcePath [
 	| location |
-
-	location := Smalltalk os environment 
+	
+	location := OSPlatform current environment
 		at: 'GITHUB_WORKSPACE'
-		ifAbsent: [ (IceRepository repositoryNamed: 'pharo-cig') location ] .
+		ifAbsent: [ (IceRepository repositoryNamed: 'pharo-cig') location ].
 
 	^ location asFileReference / 'test-resources'
 ]
