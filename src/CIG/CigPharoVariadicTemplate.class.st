@@ -18,17 +18,12 @@ CigPharoVariadicTemplate >> generate [
 
 { #category : 'generating' }
 CigPharoVariadicTemplate >> generateHeader [
-	| parsed |
 
+	| parsed |
 	parsed := self element parsedFunction.
-	parsed arguments size > 0 
-		ifFalse: [ self element selector ].
-	
+	parsed arguments size > 0 ifFalse: [ self element selector ].
+
 	^ (String streamContents: [ :stream |
-		(self element selector findTokens: $:)
-			withIndexDo: [ :each :index | 
-				stream 
-					<< each << ': ' << (parsed arguments at: index) name
-					<< ' ' ] ])
-		trimmed
+			   (self element selector findTokens: $:) withIndexDo: [ :each :index |
+				   stream << each << ': ' << (parsed arguments at: index) name << ' ' ] ]) trimBoth
 ]
