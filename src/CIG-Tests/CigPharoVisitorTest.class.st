@@ -58,10 +58,16 @@ CigPharoVisitorTest >> testAddFFILibraryWhenCUsesLibrary [
 
 { #category : 'tests - base' }
 CigPharoVisitorTest >> testAddFFITrait [
-	| visitor trait |
+	| visitor trait unit |
 	
 	visitor := CigPharoVisitor newForTest.
-	visitor addFFITrait: self translatedUnitNoiseutils.
+	unit := self translatedUnitNoiseutils.
+	
+	visitor addFFITypesClass: unit.
+	visitor file hasConstants 
+		ifTrue:[ visitor addFFIConstantsClass: unit ].
+	visitor addFFILibrary: unit.
+	visitor addFFITrait: unit.
 	
 	trait := self class environment classNamed: 'LibTGeneratedForTest'.
 	self assert: trait notNil.
