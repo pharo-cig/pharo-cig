@@ -303,14 +303,12 @@ CigCParameterTemplateTest >> testGenerateCTypeInFunctionWithPointerToStructure [
 
 { #category : 'tests - callbacks' }
 CigCParameterTemplateTest >> testGenerateCallback [
-	| template element |
 
+	| template element |
 	element := self translatedUnitNoiseutils elementAtPath: { 'noise'. 'utils'. 'NoiseMapBuilder'. 'SetCallback(NoiseMapCallback)' }.
 	template := element parameters first cTemplate.
-	
-	self 
-		assert: template generate trimmed
-		equals: 'nu_noise_utils_NoiseMapCallback pCallback'
+
+	self assert: template generate trimBoth equals: 'nu_noise_utils_NoiseMapCallback pCallback'
 ]
 
 { #category : 'tests - class' }

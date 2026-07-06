@@ -8,50 +8,42 @@ Class {
 
 { #category : 'tests' }
 CigCFunctionTemplateTest >> testGenerateBodyBasicTypeFunctionWithParameterClassReference [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'getStyle(const TColorAttr &)' }.
 	template := CigCFunctionTemplate for: element.
-		
-	self 
-		assert: template generateBody trimmed
-		equals: 'return getStyle(*(TColorAttr*)attr);'
+
+	self assert: template generateBody trimBoth equals: 'return getStyle(*(TColorAttr*)attr);'
 ]
 
 { #category : 'tests' }
 CigCFunctionTemplateTest >> testGenerateBodyFunctionWithReturnClassReferenceOverloadNew [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'getFore(const TColorAttr &)' }.
 	template := CigCFunctionTemplate for: element.
-		
-	self 
-		assert: template generateBody trimmed
-		equals: '*(TColorDesired*)result = getFore(*(TColorAttr*)attr);'
+
+	self assert: template generateBody trimBoth equals: '*(TColorDesired*)result = getFore(*(TColorAttr*)attr);'
 ]
 
 { #category : 'tests' }
 CigCFunctionTemplateTest >> testGenerateBodyIntFunctionWithParameterInt [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'min(int, int)' }.
 	template := CigCFunctionTemplate for: element.
-		
-	self 
-		assert: template generateBody trimmed
-		equals: 'return min(a, b);'
+
+	self assert: template generateBody trimBoth equals: 'return min(a, b);'
 ]
 
 { #category : 'tests' }
 CigCFunctionTemplateTest >> testGenerateBodyVoidFunctionWithParameterClassReference [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'setStyle(TColorAttr &, ushort)' }.
 	template := CigCFunctionTemplate for: element.
-		
-	self 
-		assert: template generateBody trimmed
-		equals: 'setStyle(*(TColorAttr*)attr, style);'
+
+	self assert: template generateBody trimBoth equals: 'setStyle(*(TColorAttr*)attr, style);'
 ]
 
 { #category : 'tests' }

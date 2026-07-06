@@ -8,51 +8,43 @@ Class {
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyConstructor [
-	| element template |
 
+	| element template |
 	element := self translatedUnitTvision elementAtPath: { 'TView'. 'TView(const TRect &)' }.
 	template := element cTemplate.
-	
-	self 
-		assert: template generateBody trimmed
-		equals: 'return (tv_TView*)(new TView(*(TRect*)bounds));'
+
+	self assert: template generateBody trimBoth equals: 'return (tv_TView*)(new TView(*(TRect*)bounds));'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyConstructorOverloadNew [
-	| element template |
 
+	| element template |
 	element := self translatedUnitTvision elementAtPath: { 'TScreenCell'. 'TScreenCell()' }.
 	template := element cTemplate.
-	
-	self 
-		assert: template generateBody trimmed
-		equals: 'return (tv_TScreenCell*)(new (p) TScreenCell());'
+
+	self assert: template generateBody trimBoth equals: 'return (tv_TScreenCell*)(new (p) TScreenCell());'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyConstructorOverloadNewSingleParameter [
 	"when new is overloaded but with just one parameter we can proceed as usual"
-	| element template |
 
+	| element template |
 	element := self translatedUnitTvision elementAtPath: { 'TStreamableTypes'. 'TStreamableTypes()' }.
 	template := element cTemplate.
-	
-	self 
-		assert: template generateBody trimmed
-		equals: 'return (tv_TStreamableTypes*)(new TStreamableTypes());'
+
+	self assert: template generateBody trimBoth equals: 'return (tv_TStreamableTypes*)(new TStreamableTypes());'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyDispose [
-	| element template |
 
+	| element template |
 	element := self translatedUnitTvision elementAtPath: { 'TText' }.
 	template := element cDisposeTemplate.
-	
-	self 
-		assert: template generateBody trimmed
-		equals: 'delete (TText*)self;'
+
+	self assert: template generateBody trimBoth equals: 'delete (TText*)self;'
 ]
 
 { #category : 'tests' }
@@ -100,86 +92,74 @@ return _result;'
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyStatic [
-	| element template |
 
+	| element template |
 	element := self translatedUnitTvision elementAtPath: { 'TText'. 'scroll(TStringView, int, Boolean)' }.
 	template := element cTemplate.
-	
-	self 
-		assert: template generateBody trimmed
-		equals: 'return TText::scroll(*(TStringView*)text, count, includeIncomplete);'
+
+	self assert: template generateBody trimBoth equals: 'return TText::scroll(*(TStringView*)text, count, includeIncomplete);'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyStaticReturningClass [
-	| element template |
 
+	| element template |
 	element := self translatedUnitTvision elementAtPath: { 'THardwareInfo'. 'allocateScreenBuffer()' }.
 	template := element cTemplate.
-	
-	self 
-		assert: template generateBody trimmed
-		equals: 'return (tv_TScreenCell*)(THardwareInfo::allocateScreenBuffer());'
+
+	self assert: template generateBody trimBoth equals: 'return (tv_TScreenCell*)(THardwareInfo::allocateScreenBuffer());'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyVoidMethodWithParameterCallback [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'TTimerQueue'. 'TTimerQueue(TTimePoint (&)())' }.
 	template := CigCMethodTemplate for: element.
 
-	self 
-		assert: template generateBody trimmed
-		equals: 'return (tv_TTimerQueue*)(new TTimerQueue((TTimePoint (&)())getTimeMs));'
+	self assert: template generateBody trimBoth equals: 'return (tv_TTimerQueue*)(new TTimerQueue((TTimePoint (&)())getTimeMs));'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyVoidMethodWithParameterClassReference [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'TView'. 'locate(TRect &)' }.
 	template := CigCMethodTemplate for: element.
 
-	self 
-		assert: template generateBody trimmed
-		equals: '((TView*)self)->locate(*(TRect*)bounds);'
+	self assert: template generateBody trimBoth equals: '((TView*)self)->locate(*(TRect*)bounds);'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyVoidMethodWithParameterPointerClassReference [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'TColorDialog'. 'getIndexes(TColorIndex *&)' }.
 	template := CigCMethodTemplate for: element.
 
-	self 
-		assert: template generateBody trimmed
-		equals: '((TColorDialog*)self)->getIndexes((TColorIndex*&)arg1);'
+	self assert: template generateBody trimBoth equals: '((TColorDialog*)self)->getIndexes((TColorIndex*&)arg1);'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyVoidMethodWithParameterStructReference [
-	| template element |
 
+	| template element |
 	element := self translatedUnitFinalcut elementAtPath: { 'finalcut'. 'getFAttributeWord(const FCharAttribute &)' }.
 	template := element cTemplate.
-		
-	self 
-		assert: template generateBody trimmed
+
+	self
+		assert: template generateBody trimBoth
 		equals: 'return finalcut::getFAttributeWord(*(struct finalcut::FCharAttribute*)fchar_attr);'
 ]
 
 { #category : 'tests' }
 CigCMethodTemplateTest >> testGenerateBodyVoidMethodWithouthParameters [
-	| template element |
 
+	| template element |
 	element := self translatedUnitTvision elementAtPath: { 'TView'. 'hide()' }.
 	template := CigCMethodTemplate for: element.
-		
-	self 
-		assert: template generateBody trimmed
-		equals: '((TView*)self)->hide();'
+
+	self assert: template generateBody trimBoth equals: '((TView*)self)->hide();'
 ]
 
 { #category : 'tests' }
