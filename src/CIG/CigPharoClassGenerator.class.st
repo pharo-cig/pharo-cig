@@ -68,8 +68,10 @@ CigPharoClassGenerator >> disposeTemplate [
 CigPharoClassGenerator >> generate [
 
 	self addClass.
-	self element shouldExposeDispose
-		ifTrue: [ self addDisposeMethod ].
+	self flag: #TODO_CPP. "do not add dispose methods as this is not working at the moment. 
+	 this is more for cpp classes also, not for any opaque object."
+	"self element shouldExposeDispose
+		ifTrue: [ self addDisposeMethod ]."
 	self addClassComment
 ]
 
