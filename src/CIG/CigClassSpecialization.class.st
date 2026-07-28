@@ -74,7 +74,7 @@ CigClassSpecialization >> fromClassTemplate: aClassTemplate specializedTypes: aC
 		yourself.
 	name := aClassTemplate specializedNameWithTypes: aCollection.
 	templateName := String streamContents: [ :stream | 
-		stream << aClassTemplate basename << '<' << aCollection asCommaString << '>' ].
+		stream << aClassTemplate basename << '<' << (', ' join: aCollection) << '>' ].
 	self basicFromClassTemplate: aClassTemplate.
 	"I am just interested in class members here"
 	elements := aClassTemplate classMembers collect: [ :each | 

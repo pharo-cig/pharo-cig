@@ -87,7 +87,7 @@ CigCTypedefTemplate >> resolveTypeNameSpecialization: aString [
 	^ String streamContents: [ :stream |
 		stream << (self resolveTypeName: aString).
 		stream << '<'.
-		stream << declarations asCommaString.
+		stream <<  (', ' join: declarations).
 		stream << '>' ]
 ]
 

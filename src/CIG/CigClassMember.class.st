@@ -171,7 +171,7 @@ CigClassMember >> isTemplateOf: aClassTemplate [
 { #category : 'accessing' }
 CigClassMember >> parametersAsList [
 
-	^ (self parameters collect: [ :each | each asParameterString ]) asCommaString
+	^ ', ' join: (self parameters collect: [ :each | each asParameterString ])
 ]
 
 { #category : 'accessing' }

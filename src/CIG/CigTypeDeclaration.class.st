@@ -135,7 +135,9 @@ CigTypeDeclaration >> reference: aBoolean [
 { #category : 'accessing' }
 CigTypeDeclaration >> templateName [
 
-	^ templates ifNotNil: #asCommaString
+	templates ifNil: [ ^ nil ].
+	
+	^ ', ' join: templates
 ]
 
 { #category : 'accessing' }

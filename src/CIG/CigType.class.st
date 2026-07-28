@@ -98,13 +98,13 @@ CigType class >> replaceTypeClassTemplate: aClassTemplate types: aCollection in:
 	
 	type := CigFunctionParser parse: aString.
 	classTemplateType := String streamContents: [ :stream | 
-		stream << aClassTemplate basename << '<' << ((aClassTemplate templateTypeParameters collect: #name) asCommaString) << '>' ].
+		stream << aClassTemplate basename << '<' << (', ' join: (aClassTemplate templateTypeParameters collect: #name)) << '>' ].
 	
 	(aString includesSubstring: classTemplateType)
 		ifFalse: [ self error: 'Class templates do not correspond to type to match.' ]. 
 	
 	classType := String streamContents: [ :stream | 
-		stream << aClassTemplate basename << '<' << aCollection asCommaString << '>' ].
+		stream << aClassTemplate basename << '<' << (', ' join: aCollection) << '>' ].
 		
 	^ String streamContents: [ :stream | 
 		(aString includesSubstring: 'const ')

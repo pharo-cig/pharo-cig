@@ -28,5 +28,5 @@ CigCParameterClassSpecializationTemplate >> generateArgument [
 { #category : 'accessing' }
 CigCParameterClassSpecializationTemplate >> specializationTypes [
 	
-	^ self type parent specializationTypes asCommaString
+	^ ', ' join: self type parent specializationTypes
 ]
