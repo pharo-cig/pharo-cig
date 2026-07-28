@@ -12,8 +12,8 @@ CigPharoTypedefCallbackTemplate class >> handlesElement: anElement [
 	^ anElement definesFunctionPointer
 ]
 
-{ #category : 'generating' }
+{ #category : 'accessing' }
 CigPharoTypedefCallbackTemplate >> generate [
 
-	^ 'FFICallback'
+	^ (self element root nameGenerator prefixToUse: self element root prefix) , 'Callback'
 ]

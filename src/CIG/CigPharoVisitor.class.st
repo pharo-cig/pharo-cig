@@ -96,6 +96,15 @@ CigPharoVisitor >> endUnit: aUnit [
 	self executeInitializations
 ]
 
+{ #category : 'generation' }
+CigPharoVisitor >> ensureBaseCallbackClass: aUnit [
+	| generator |
+	
+	generator := CigPharoBaseCallbackClassGenerator newFile: self file unit: aUnit.
+	generator baseCallbackClass ifNotNil: [ ^ self ].
+	generator generate
+]
+
 { #category : 'private' }
 CigPharoVisitor >> ensureBaseEnumerationClass: aUnit [ 
 	| generator |

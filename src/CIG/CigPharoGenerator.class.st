@@ -38,6 +38,18 @@ CigPharoGenerator class >> newFile: aFile unit: aUnit [
 		yourself
 ]
 
+{ #category : 'accessing' }
+CigPharoGenerator >> baseCallbackClass [
+
+	^ self class environment classNamed: self baseCallbackClassName
+]
+
+{ #category : 'accessing' }
+CigPharoGenerator >> baseCallbackClassName [
+
+	^ String streamContents: [ :stream | stream << (self file nameGenerator prefixToUse: self prefix) << 'Callback' ]
+]
+
 { #category : 'private' }
 CigPharoGenerator >> baseEnumClass [
 

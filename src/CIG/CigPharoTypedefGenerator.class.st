@@ -11,19 +11,19 @@ CigPharoTypedefGenerator >> generate [
 	"in fact, typedef just has to register to be added after"
 ]
 
-{ #category : 'generating' }
+{ #category : 'generation' }
 CigPharoTypedefGenerator >> generateOn: aVisitor [
-	"in fact, typedef just has to register to be added after"
 	| declaration template |
 	
 	declaration := self element cDeclaration.
 	template := self element phTemplate generate.
-	
-	logger trace: declaration. 
+
+	self element definesFunctionPointer 
+		ifTrue: [ aVisitor ensureBaseCallbackClass: self element root ].
+
+	logger trace: declaration.
 	logger trace: template.
-	
+
 	super generateOn: aVisitor.
-	aVisitor 
-		registerDeclaration: declaration 
-		as: template
+	aVisitor registerDeclaration: declaration as: template
 ]

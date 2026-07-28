@@ -35,8 +35,8 @@ CigCParameterFunctionTypeTemplate >> generateCType [
 	^ 'void*'
 ]
 
-{ #category : 'generating' }
+{ #category : 'accessing' }
 CigCParameterFunctionTypeTemplate >> generateFFITypeForField [
 
-	^ #FFICallback
+	^ ((self element root nameGenerator prefixToUse: self element root prefix) , 'Callback') asSymbol
 ]
