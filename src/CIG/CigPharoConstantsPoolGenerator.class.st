@@ -161,9 +161,11 @@ CigPharoConstantsPoolGenerator >> groupStrategy [
 
 { #category : 'private' }
 CigPharoConstantsPoolGenerator >> retrieveLiteralConstantIn: aMacroDefinition [
-
-	| sourceReference binaryReference result source |
-	logger trace: aMacroDefinition. "if this is just a definition, it means 1, because 
+	| sourceReference binaryReference result |
+	
+	logger trace: aMacroDefinition. 
+	
+	"if this is just a definition, it means 1, because 
 		#define SOMEMACRO 
 		is equivalent to 
 		#define SOMEMACRO 1"

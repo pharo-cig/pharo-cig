@@ -60,7 +60,7 @@ CigElementGenerator >> postProcess: aUnit [
  		do: [ :each | each value: aUnit ].
  
 	transforms keysAndValuesDo: [ :aName :aBlock | 
-		aUnit elements 
+		aUnit elements copy
 			select: [ :each | each name = aName ] 
 			thenDo: [ :anElement | aBlock value: anElement ] ]
 ]
