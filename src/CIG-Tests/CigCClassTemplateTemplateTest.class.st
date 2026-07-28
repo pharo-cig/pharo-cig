@@ -17,7 +17,7 @@ CigCClassTemplateTemplateTest >> testGenerateClassSpecializationHeaders [
 	visitor visitClassTemplate: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef void tv_TSpan;
 typedef void tv_TSpanChar;
 typedef void tv_TSpanTScreenCell;

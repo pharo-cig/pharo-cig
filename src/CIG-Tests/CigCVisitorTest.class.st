@@ -15,14 +15,14 @@ CigCVisitorTest >> testVisitClassGeneratesATypedef [
 	visitor visitClass: element.
 	"just first line because TView has inner enums"
 	self 
-		assert: visitor hStream contents trimmed lines first
+		assert: visitor hStream contents trimBoth lines first
 		equals: 'typedef void tv_TView;'.
 		
 	element := self translatedUnitNoise elementAtPath: { 'noise'. 'module'. 'Module' }.
 	visitor := CigCHeaderDeclareVisitor newForTest.
 	visitor visitClass: element.
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef void no_noise_module_Module;'
 ]
 
@@ -56,7 +56,7 @@ CigCVisitorTest >> testVisitClassTemplateGeneratesATypedefForEachDefinedType [
 	visitor visitClassTemplate: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents 
 		equals: 'typedef void tv_TSpan;
 typedef void tv_TSpanChar;
 typedef void tv_TSpanTScreenCell;
@@ -107,7 +107,7 @@ CigCVisitorTest >> testVisitClassWithNestedEnumEmitsEnum [
 	visitor visitClass: element.
 	
 	self 
-		assert: visitor hStream contents trimmed 
+		assert: visitor hStream contents  
 		equals: 'typedef void tv_THardwareInfo;
 typedef THardwareInfo::ConsoleType tv_THardwareInfo_ConsoleType;
 typedef THardwareInfo::PlatformType tv_THardwareInfo_PlatformType;'
@@ -121,7 +121,7 @@ CigCVisitorTest >> testVisitClassWithTypedefGenerateTypedefs [
 	visitor := CigCHeaderDeclareVisitor newForTest.
 	visitor visitClass: element.
 	
-	content := visitor hStream contents trimmed.
+	content := visitor hStream contents .
 	self assert: (content includesSubstring: 'typedef void tv_pstream;').
 	self assert: (content includesSubstring: 'typedef int tv_pstream_openmode;').
 	self assert: (content includesSubstring: 'typedef int tv_pstream_seekdir;')
@@ -137,11 +137,11 @@ CigCVisitorTest >> testVisitConstructorWithOverloadedNewGeneratesCorrectParamete
 	visitor visitConstructor: element.
 	
 	self 
-		assert: visitor hStream contents trimmed 
+		assert: visitor hStream contents trimBoth 
 		equals: 'tv_TScreenCell* tv_TScreenCell_new_1(void* p);'.
 		
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'tv_TScreenCell* tv_TScreenCell_new_1(void* p) {
 	return (tv_TScreenCell*)(new (p) TScreenCell());
 }'
@@ -161,7 +161,7 @@ CigCVisitorTest >> testVisitEnumUnnamedGeneratesCorrectName [
 	visitor visitEnum: element.
 	
 	self 
-		assert: visitor hStream contents trimmed lines first
+		assert: visitor hStream contents  lines first
 		equals: 'enum tv_unnamed_enum_1 {'.
 ]
 
@@ -175,7 +175,7 @@ CigCVisitorTest >> testVisitEnumWithOneLevelEmitsTypedef [
 	visitor visitEnum: element.
 	
 	self 
-		assert: visitor hStream contents trimmed 
+		assert: visitor hStream contents  
 		equals: 'typedef StreamableInit tv_StreamableInit;'
 ]
 
@@ -189,7 +189,7 @@ CigCVisitorTest >> testVisitFunctionDisambiguate [
 	visitor visitFunction: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents 
 		equals: 'void tv_fexpand_1(char* rpath);'
 ]
 
@@ -203,11 +203,11 @@ CigCVisitorTest >> testVisitFunctionReturningClassGenerateCorrectMethodTemplate 
 	visitor visitFunction: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'tv_TColorBIOS* tv_RGBtoBIOS(tv_TColorRGB* arg1);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'tv_TColorBIOS* tv_RGBtoBIOS(tv_TColorRGB* arg1) {
 	auto _tmp = RGBtoBIOS(*(TColorRGB*)arg1);
 	auto _result = std::make_unique<TColorBIOS>(_tmp);
@@ -227,11 +227,11 @@ CigCVisitorTest >> testVisitFunctionReturningClassWithOverloadedNewGenerateCorre
 	visitor visitFunction: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'void tv_getFore(tv_TColorAttr* attr, tv_TColorDesired* result);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'void tv_getFore(tv_TColorAttr* attr, tv_TColorDesired* result) {
 	*(TColorDesired*)result = getFore(*(TColorAttr*)attr);
 }'
@@ -258,11 +258,11 @@ void f(const char *format, ...) {
 	visitor visitFunction: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'char* tv_fmtStr(const char* format, ...);'.
 		
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'char* tv_fmtStr(char* format, ...) {
 	void* _args = __builtin_apply_args();
 	void* _result = __builtin_apply((void (*)())fmtStr, _args, 1000);
@@ -281,7 +281,7 @@ CigCVisitorTest >> testVisitMethodDeclaredWithoutArgumentNamesGeneratesDefaultNa
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents 
 		equals: 'Boolean tv_TEditor_insertBuffer(tv_TEditor* self, const char* arg1, tv_uint arg2, tv_uint arg3, Boolean arg4, Boolean arg5);'
 ]
 
@@ -295,11 +295,11 @@ CigCVisitorTest >> testVisitMethodParameterStdStringCastsCorrectly [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'void nu_noise_utils_WriterBMP_SetDestFilename(nu_noise_utils_WriterBMP* self, char* filename);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'void nu_noise_utils_WriterBMP_SetDestFilename(nu_noise_utils_WriterBMP* self, char* filename) {
 	((noise::utils::WriterBMP*)self)->SetDestFilename(std::string(filename));
 }'
@@ -315,11 +315,11 @@ CigCVisitorTest >> testVisitMethodReturningClassGenerateCorrectMethodTemplate [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'nu_noise_utils_Color* nu_noise_utils_Image_GetBorderValue(nu_noise_utils_Image* self);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'nu_noise_utils_Color* nu_noise_utils_Image_GetBorderValue(nu_noise_utils_Image* self) {
 	auto _tmp = ((noise::utils::Image*)self)->GetBorderValue();
 	auto _result = std::make_unique<noise::utils::Color>(_tmp);
@@ -337,11 +337,11 @@ CigCVisitorTest >> testVisitMethodReturningClassPtrGeneratesCorrectReturnType [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'nu_noise_utils_Color* nu_noise_utils_Image_GetConstSlabPtr_2(nu_noise_utils_Image* self, int row);'.
 	
 	self 
-		assert: visitor cStream contents trimmed 
+		assert: visitor cStream contents trimBoth 
 		equals: 'nu_noise_utils_Color* nu_noise_utils_Image_GetConstSlabPtr_2(nu_noise_utils_Image* self, int row) {
 	return (nu_noise_utils_Color*)(((noise::utils::Image*)self)->GetConstSlabPtr(row));
 }'
@@ -357,11 +357,11 @@ CigCVisitorTest >> testVisitMethodReturningStdStringCastsCorrectly [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'char* nu_noise_utils_WriterBMP_GetDestFilename(nu_noise_utils_WriterBMP* self);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'char* nu_noise_utils_WriterBMP_GetDestFilename(nu_noise_utils_WriterBMP* self) {
 	auto _tmp = ((noise::utils::WriterBMP*)self)->GetDestFilename();
 	auto _result = _tmp.c_str();
@@ -379,11 +379,11 @@ CigCVisitorTest >> testVisitMethodWithClassTemplateCastsCorrectly [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'int tv_TText_drawStr_1(tv_TSpan* cells, size_t indent, tv_TStringView* text, int textIndent);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'int tv_TText_drawStr_1(tv_TSpan* cells, size_t indent, tv_TStringView* text, int textIndent) {
 	return TText::drawStr(*(TSpan<TScreenCell>*)cells, indent, *(TStringView*)text, textIndent);
 }'
@@ -399,11 +399,11 @@ CigCVisitorTest >> testVisitMethodWithReferenceTypeCastsCorrectly [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'void tv_TText_scroll_2(tv_TStringView* text, int count, Boolean includeIncomplete, size_t* length, size_t* width);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'void tv_TText_scroll_2(tv_TStringView* text, int count, Boolean includeIncomplete, size_t* length, size_t* width) {
 	TText::scroll(*(TStringView*)text, count, includeIncomplete, *length, *width);
 }'
@@ -418,11 +418,11 @@ CigCVisitorTest >> testVisitMethodWithReturnClassInstance [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'fc_finalcut_FPoint* fc_finalcut_FWidget_termToWidgetPos(fc_finalcut_FWidget* self, fc_finalcut_FPoint* arg1);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'fc_finalcut_FPoint* fc_finalcut_FWidget_termToWidgetPos(fc_finalcut_FWidget* self, fc_finalcut_FPoint* arg1) {
 	auto _tmp = ((finalcut::FWidget*)self)->termToWidgetPos(*(finalcut::FPoint*)arg1);
 	auto _result = std::make_unique<finalcut::FPoint>(_tmp);
@@ -440,11 +440,11 @@ CigCVisitorTest >> testVisitMethodWithTypeReference [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'void tv_TCellChar_moveWideCharTrail(tv_TCellChar* self);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'void tv_TCellChar_moveWideCharTrail(tv_TCellChar* self) {
 	((TCellChar*)self)->moveWideCharTrail();
 }'
@@ -460,7 +460,7 @@ CigCVisitorTest >> testVisitOpaqueStructureGeneratesATypedef [
 	visitor visitStructure: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef void tv_TTimer;'.
 ]
 
@@ -474,11 +474,11 @@ CigCVisitorTest >> testVisitStaticMethodsGeneratesClassSideFunction [
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents trimBoth
 		equals: 'int tv_TText_scroll_1(tv_TStringView* text, int count, Boolean includeIncomplete);'.
 	
 	self 
-		assert: visitor cStream contents trimmed
+		assert: visitor cStream contents trimBoth
 		equals: 'int tv_TText_scroll_1(tv_TStringView* text, int count, Boolean includeIncomplete) {
 	return TText::scroll(*(TStringView*)text, count, includeIncomplete);
 }'
@@ -494,7 +494,7 @@ CigCVisitorTest >> testVisitStructureWithAnonymousUnionGeneratesCorrectCStruct [
 	visitor visitStructure: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents 
 		equals: 'struct tv_MessageEvent {
 	tv_ushort command;
 	union {
@@ -530,7 +530,7 @@ CigCVisitorTest >> testVisitTypedefWithCallback [
 	visitor visitTypedef: element.
 	
 	self 
-		assert: visitor hStream contents trimmed 
+		assert: visitor hStream contents  
 		equals: 'typedef void* nu_noise_utils_NoiseMapCallback;'
 ]
 
@@ -544,7 +544,7 @@ CigCVisitorTest >> testVisitUsingDeclarationGeneratesTypedefToTypedef [
 	visitor visitUsingDeclaration: element.
 	
 	self 
-		assert: visitor hStream contents trimmed
+		assert: visitor hStream contents 
 		equals: 'typedef std::streampos tv_streampos;'.
 
 ]

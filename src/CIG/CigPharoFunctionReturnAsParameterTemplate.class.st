@@ -23,7 +23,7 @@ CigPharoFunctionReturnAsParameterTemplate >> generateHeader [
 			self 
 				buildParameters: self parameters 
 				on: stream ])
-		trimmed
+		
 ]
 
 { #category : 'private' }
