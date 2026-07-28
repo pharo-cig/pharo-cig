@@ -39,7 +39,7 @@ CigPharoFieldTemplateTest >> testGenerateCallbackFieldDesc [
 	
 	self 
 		assert: template generateFieldDesc
-		equals: 'FFICallback free_part'
+		equals: 'XxCallback free_part'
 ]
 
 { #category : 'tests' }

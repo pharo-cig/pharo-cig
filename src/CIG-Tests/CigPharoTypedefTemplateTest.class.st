@@ -35,7 +35,7 @@ CigPharoTypedefTemplateTest >> testVisitTypedefWithFunctionPointer [
 	element := self translatedUnitOpenSSL elementAtPath: { 'SSL_custom_ext_add_cb_ex' }.	
 	template := element phTemplate.
 
-	self assert: template generate equals: 'FFICallback'
+	self assert: template generate equals: 'XxCallback'
 ]
 
 { #category : 'tests' }
