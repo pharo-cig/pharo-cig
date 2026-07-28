@@ -992,20 +992,25 @@ CigPharoVisitorTest >> testVisitTypedefUlong [
 
 { #category : 'tests - typedef' }
 CigPharoVisitorTest >> testVisitTypedefWithCallback [
-	| element visitor |
+	| unit element visitor |
 
-	element := self translatedUnitNoiseutils elementAtPath: { 'noise'. 'utils'. 'NoiseMapCallback' }.
+	unit := self newUnit: '
+typedef void (*NoiseMapCallback)(int);
+'.
+
+	element := unit elements first.
 	
 	visitor := CigPharoVisitor newForTest.
+	visitor addBaseClasses: unit.
 	visitor visitTypedef: element.
 
 	self 
 		assert: visitor types keys first
-		equals: 'xx_noise_utils_NoiseMapCallback'.
+		equals: 'NoiseMapCallback'.
 	
 	self 
 		assert: visitor types values first
-		equals: 'XxCallback'
+		equals: 'UnitCallback'
 ]
 
 { #category : 'tests - typedef' }
