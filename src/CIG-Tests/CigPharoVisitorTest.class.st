@@ -1005,7 +1005,7 @@ CigPharoVisitorTest >> testVisitTypedefWithCallback [
 	
 	self 
 		assert: visitor types values first
-		equals: 'FFICallback'
+		equals: 'XxCallback'
 ]
 
 { #category : 'tests - typedef' }
