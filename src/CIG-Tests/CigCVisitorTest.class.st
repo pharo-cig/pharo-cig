@@ -56,7 +56,7 @@ CigCVisitorTest >> testVisitClassTemplateGeneratesATypedefForEachDefinedType [
 	visitor visitClassTemplate: element.
 	
 	self 
-		assert: visitor hStream contents 
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef void tv_TSpan;
 typedef void tv_TSpanChar;
 typedef void tv_TSpanTScreenCell;
@@ -107,7 +107,7 @@ CigCVisitorTest >> testVisitClassWithNestedEnumEmitsEnum [
 	visitor visitClass: element.
 	
 	self 
-		assert: visitor hStream contents  
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef void tv_THardwareInfo;
 typedef THardwareInfo::ConsoleType tv_THardwareInfo_ConsoleType;
 typedef THardwareInfo::PlatformType tv_THardwareInfo_PlatformType;'
@@ -121,7 +121,7 @@ CigCVisitorTest >> testVisitClassWithTypedefGenerateTypedefs [
 	visitor := CigCHeaderDeclareVisitor newForTest.
 	visitor visitClass: element.
 	
-	content := visitor hStream contents .
+	content := visitor hStream contents trimBoth.
 	self assert: (content includesSubstring: 'typedef void tv_pstream;').
 	self assert: (content includesSubstring: 'typedef int tv_pstream_openmode;').
 	self assert: (content includesSubstring: 'typedef int tv_pstream_seekdir;')
@@ -161,7 +161,7 @@ CigCVisitorTest >> testVisitEnumUnnamedGeneratesCorrectName [
 	visitor visitEnum: element.
 	
 	self 
-		assert: visitor hStream contents  lines first
+		assert: visitor hStream contents trimBoth lines first
 		equals: 'enum tv_unnamed_enum_1 {'.
 ]
 
@@ -175,7 +175,7 @@ CigCVisitorTest >> testVisitEnumWithOneLevelEmitsTypedef [
 	visitor visitEnum: element.
 	
 	self 
-		assert: visitor hStream contents  
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef StreamableInit tv_StreamableInit;'
 ]
 
@@ -189,7 +189,7 @@ CigCVisitorTest >> testVisitFunctionDisambiguate [
 	visitor visitFunction: element.
 	
 	self 
-		assert: visitor hStream contents 
+		assert: visitor hStream contents trimBoth
 		equals: 'void tv_fexpand_1(char* rpath);'
 ]
 
@@ -281,7 +281,7 @@ CigCVisitorTest >> testVisitMethodDeclaredWithoutArgumentNamesGeneratesDefaultNa
 	visitor visitMethod: element.
 	
 	self 
-		assert: visitor hStream contents 
+		assert: visitor hStream contents trimBoth
 		equals: 'Boolean tv_TEditor_insertBuffer(tv_TEditor* self, const char* arg1, tv_uint arg2, tv_uint arg3, Boolean arg4, Boolean arg5);'
 ]
 
@@ -494,7 +494,7 @@ CigCVisitorTest >> testVisitStructureWithAnonymousUnionGeneratesCorrectCStruct [
 	visitor visitStructure: element.
 	
 	self 
-		assert: visitor hStream contents 
+		assert: visitor hStream contents trimBoth
 		equals: 'struct tv_MessageEvent {
 	tv_ushort command;
 	union {
@@ -530,7 +530,7 @@ CigCVisitorTest >> testVisitTypedefWithCallback [
 	visitor visitTypedef: element.
 	
 	self 
-		assert: visitor hStream contents  
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef void* nu_noise_utils_NoiseMapCallback;'
 ]
 
@@ -544,7 +544,7 @@ CigCVisitorTest >> testVisitUsingDeclarationGeneratesTypedefToTypedef [
 	visitor visitUsingDeclaration: element.
 	
 	self 
-		assert: visitor hStream contents 
+		assert: visitor hStream contents trimBoth
 		equals: 'typedef std::streampos tv_streampos;'.
 
 ]
