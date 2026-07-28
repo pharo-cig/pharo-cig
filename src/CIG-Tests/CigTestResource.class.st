@@ -194,7 +194,7 @@ CigTestResource class >> resourceFileName: aLibName [
 CigTestResource class >> resourcePath [
 	| location |
 	
-	location := OSPlatform current environment
+	location := OSEnvironment current
 		at: 'GITHUB_WORKSPACE'
 		ifAbsent: [ (IceRepository repositoryNamed: 'pharo-cig') location ].
 
