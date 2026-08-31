@@ -37,16 +37,18 @@ CigType class >> canBeExported: aString [
 CigType class >> createTypeMap [
 
 	^ Dictionary newFromPairs: {
-	'unsigned'. 			#uint.
-	'unsigned int'. 		#uint.
-	'unsigned long'. 	#ulong.
-	'unsigned short'. 	#ushort.
-	'unsigned char'. 	#uchar.
-	'signed char'. 	   	#char.
-	'signed'.	  	    #int.
-	'signed int'.     	#int.
-	'long double'.    	#float128.
-	'_Bool'.			 	#bool.
+	'unsigned'. 				#uint.
+	'unsigned int'. 			#uint.
+	'unsigned long'. 		#ulong.
+	'unsigned long long'. 	#uint64.
+	'unsigned short'. 		#ushort.
+	'unsigned char'. 		#uchar.
+	'signed char'. 	   		#char.
+	'signed'.	  	    		#int.
+	'signed int'.     		#int.
+	'long long'. 			#int64.
+	'long double'.    		#float128.
+	'_Bool'.			 		#bool.
 	}
 ]
 
