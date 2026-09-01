@@ -68,6 +68,8 @@ CigNameGenerator >> applyRemovePrefixInName: aString prefix: prefix [
 	(aString asLowercase beginsWith: prefix asLowercase) ifFalse: [ ^ aString ].
 	
 	result := aString allButFirst: prefix size.
+	result ifEmpty: [ ^ aString ].
+	
 	[ result first = $_ ] 
 	whileTrue: [ result := result allButFirst ].
 	
